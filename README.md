@@ -8,7 +8,7 @@ MANGO defines the local microenvironment of each reference cell using a k-neares
 <img align="top" src="man/figures/mango_overview.png" alt="drawing" width="900"/>
 
 ## Install the Package
-Install mango from GitHub:
+Install MANGO from GitHub:
 ```r
 remotes::install_github("ZihanYang030/MANGO")
 library(MANGO)
