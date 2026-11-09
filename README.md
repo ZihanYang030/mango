@@ -7,6 +7,12 @@ MANGO defines the local microenvironment of each reference cell using a k-neares
 
 <img align="top" src="man/figures/mango_overview.png" alt="drawing" width="900"/>
 
+Schematic of mLCLQ calculation 
+
+For each reference cell, we compute local weighted proportions of the query types within neighborhoods using spatial weights and observed cell-type labels. The proportions are combined and divided by the global cell-type abundance to obtain an observed mLCLQ score. We then repeat the calculation with independently permuted labels produces null scores.
+
+<img align="top" src="man/figures/mango_algorithm.png" alt="drawing" width="900"/>
+
 ## Install the Package
 Install MANGO from GitHub:
 ```r
