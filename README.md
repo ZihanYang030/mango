@@ -14,8 +14,10 @@ Schematic of mLCLQ calculation
 For each reference cell, we compute local weighted proportions of the query types within neighborhoods using spatial weights and observed cell-type labels. The proportions are combined and divided by the global cell-type abundance to obtain an observed mLCLQ score. We then repeat the calculation with independently permuted labels produces null scores.
 
 <p align="center">
-  <img src="man/figures/mango_algorithm.png" alt="MANGO algorithm" width="750">
+  <img src="man/figures/mango_algorithm.png" alt="MANGO algorithm" width="800">
 </p>
+
+MANGO is under active development. We appreciate any suggestions and feedback. Contact: [zy56@rice.edu](mailto:zy56@rice.edu). 
 
 ## Install the Package
 Install MANGO from GitHub:
