@@ -2,9 +2,8 @@ Package: MANGO
 Title: Mapping Multicellular Spatial Relationships Across Scales
 Version: 1.0.0
 Authors@R:
-    c(person("Zihan", "Yang", email = "zy56@rice.edu",
-             role = c("aut", "cre")),
-      person("Lulu", "Shang", role = "aut"))
+    c(person("Zihan", "Yang", email = "zy56@rice.edu", role = c("aut", "cre")),
+      person("Lulu", "Shang", email = "LShang@mdanderson.org", role = "aut"))
 Description: MANGO, a permutation-based computational framework for detecting higher-order spatial co-localization among three or more cell types across multiple spatial scales. 
 License: GPL (>= 3)
 Encoding: UTF-8
