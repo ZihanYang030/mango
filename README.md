@@ -27,6 +27,8 @@ library(MANGO)
 ```
 
 ## Quick Start
+
+### Visualization
 ```r
 library(MANGO)
 library(patchwork)
