@@ -111,15 +111,15 @@ plot_reference_query_interactions_multi_image_mean <- function(multiscale_result
     labs(title = title, x = "Scale", y = "SES Score", color = if (is.null(color_by)) "Reference-Query" else color_by) +
     theme_minimal() +
     theme(
-      axis.text.x = element_text(size = 9, color = "black", angle = 90, vjust = 0.5, hjust = 0),
-      axis.text.y = element_text(size = 9, color = "black"),
-      axis.title = element_text(size = 11),
-      plot.title = element_text(size = 12),
+      axis.text.x = element_text(size = 11, color = "black", angle = 90, vjust = 0.5, hjust = 0),
+      axis.text.y = element_text(size = 11, color = "black"),
+      axis.title = element_text(size = 13),
+      plot.title = element_text(size = 14),
       panel.grid.major = element_line(linewidth = 0.1, colour = "gray90"),
       panel.border = element_rect(colour = "black", fill = NA, linewidth = 0.1),
       legend.position = "bottom",
-      legend.title = element_text(size = 10),
-      legend.text = element_text(size = 9)
+      legend.title = element_text(size = 13),
+      legend.text = element_text(size = 11)
     ) +
     guides(color = guide_legend(nrow = 1))
 }
