@@ -153,7 +153,7 @@ We visualize the mean SES score for each interaction across multiple permutation
   <img src="man/figures/simulation_results_demo.png" alt="weight_kernels" width="900">
 </p>
 
-The trendline plot shows a summary of each interaction across different scales, the SES score spatial map shows where each aggregation is observed
+The trendline plot shows a summary of each interaction across different scales; the SES score spatial map shows where each aggregation is observed, where high SES scores (yellow) represent aggregations, low SES scores (blue) represent repulsions. 
 
 ## License
 MANGO is licensed under the GNU General Public License v3.0 or any later version.
