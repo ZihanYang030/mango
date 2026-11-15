@@ -30,7 +30,7 @@ library(MANGO)
 
 ### Visualization
 
-Visualize a simulated section
+Visualize a simulated section.
 ```r
 library(MANGO)
 library(patchwork)
@@ -48,6 +48,53 @@ p1 + p2
 ```
 <p align="center">
   <img src="man/figures/simulation_viz.png" alt="simulation_viz" width="800">
+</p>
+
+### Build Neighborhoods
+
+Here, we show an example knn neighborhoods built with k = 35, three weight kernels available.
+
+```r
+occurr_prob <- calculate_occurrence_probability_multi_image(sim_sce, type_column = "cell_type", image_column = "image_number")
+
+# gaussian weight
+weight_g <- compute_spatial_weights_multi_image(sim_sce, type_column = "cell_type",
+                                               type_column = "cell_type", point_type = "A", 
+                                               image_column = "image_number", method = "k_nearest", 
+                                               k = 35, coords = c("x_coord", "y_coord"), kernel = "gaussian")
+
+# we also have matern and exponential weights available
+weight_m <- compute_spatial_weights_multi_image(sim_sce, type_column = "cell_type",
+                                               type_column = "cell_type", point_type = "A", 
+                                               image_column = "image_number", method = "k_nearest", 
+                                               k = 35, coords = c("x_coord", "y_coord"), kernel = "matern")
+
+weight_e <- compute_spatial_weights_multi_image(sim_sce, type_column = "cell_type",
+                                                type_column = "cell_type", point_type = "A", 
+                                                image_column = "image_number", method = "k_nearest", 
+                                                k = 35, coords = c("x_coord", "y_coord"), kernel = "exponential")
+```
+
+Visualize a neighborhood with three available weight kernels.
+
+```r
+p_g <- Plot_Stored_Neighborhood(sim_sce, weight_g, type_column = "cell_type", reference_cell = "3329", 
+                                coords = c("x_coord", "y_coord"), neighbor_color_by = "weight",
+                                zoom = TRUE, title = "Gaussian Weight")
+  
+p_m <- Plot_Stored_Neighborhood(sim_sce, weight_m, type_column = "cell_type", reference_cell = "3329", 
+                                coords = c("x_coord", "y_coord"), neighbor_color_by = "weight",
+                                zoom = TRUE, title = "Matern Weight")
+  
+p_e <- Plot_Stored_Neighborhood(sim_sce, weight_e, type_column = "cell_type", reference_cell = "3329", 
+                                coords = c("x_coord", "y_coord"), neighbor_color_by = "weight",
+                                zoom = TRUE, title = "Exponential Weight")
+  
+p_g + p_m + p_e
+```
+
+<p align="center">
+  <img src="man/figures/weight_kernels.png" alt="weight_kernels" width="800">
 </p>
 
 ## License

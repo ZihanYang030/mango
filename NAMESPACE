@@ -2,6 +2,7 @@
 
 export(Plot_Basic)
 export(Plot_Basic_3D)
+export(Plot_Stored_Neighborhood)
 export(Scatter_Heatmap)
 export(build_sce)
 export(calculate_mvlclq_multi_image)
