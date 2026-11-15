@@ -143,7 +143,10 @@ heatmap_BC <- Scatter_Heatmap(
   coords = c("x_coord", "y_coord"), scale = 2000, image_name = "1", 
   query_celltype = "B_C", reference_celltype = "A", title = "A-B-C SES Score", point_size = 1)
 
-trendline_plot | ((heatmap_B | heatmap_C) / (heatmap_BC | p1)) + plot_layout(widths = c(1, 4))
+no_axes <- theme(axis.title = element_blank(), axis.text = element_blank(),
+                 axis.ticks = element_blank(), panel.grid = element_blank())
+
+trendline_plot | ((heatmap_B | heatmap_C) / (heatmap_BC | p1)) & no_axes
 ```
 
 <p align="center">
