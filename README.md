@@ -189,6 +189,98 @@ b) in noisy experimental datasets, constituent pairwise aggregations do not alwa
 
 ### Triple-Negative Breast Cancer
 
+**Single FOV Analysis**
+
+```r
+# read in data
+stanford_preprocessed <- readH5AD("/File/Path/to/stanford_preprocessed.h5ad")
+
+# extract coordinates
+spatial_coords <- stanford_preprocessed@int_colData@listData[["reducedDims"]]@listData[["spatial"]]
+
+x_coordinate <- spatial_coords[, "centroid-0"]
+y_coordinate <- spatial_coords[, "centroid-1"]
+
+colData(stanford_preprocessed)$x_coordinate <- x_coordinate
+colData(stanford_preprocessed)$y_coordinate <- y_coordinate
+
+stanford_preprocessed_individual_image <- stanford_preprocessed[, stanford_preprocessed$fov == "TMA30S1_R2C7"]
+
+# visualizations
+plot1 <- Plot_Basic(stanford_preprocessed_individual_image, 
+                   type_column = "cell_cluster",
+                   highlight_celltypes = NULL,
+                   coords = c("x_coordinate", "y_coordinate"),
+                   title = NULL,
+                   point_size = 2)
+
+plot2 <- Plot_Basic(stanford_preprocessed_individual_image, 
+                    type_column = "cell_cluster",
+                    highlight_celltypes = c("B", "CD4T", "CD8T"),
+                    coords = c("x_coordinate", "y_coordinate"),
+                    title = NULL,
+                    point_size = 2)
+
+(plot1 + plot2)
+```
+
+<p align="center">
+  <img src="man/figures/TMA30S1_R7C1_Viz.png" alt="weight_kernels" width="800">
+</p>
+
+```r
+# mango analysis pipeline
+
+occurr_prob_TMA30S1_R2C7 <- calculate_occurrence_probability_multi_image(
+  stanford_preprocessed_individual_image, type_column = "cell_cluster", image_column = "fov")
+
+weights_data_TMA30S1_R2C7 <- compute_spatial_weights_multi_image(
+  stanford_preprocessed_individual_image, type_column = "cell_cluster", point_type = "B",
+  image_column = "fov", method = "k_nearest", k = 15,
+  coords = c("x_coordinate", "y_coordinate"), exclude_ref_as_neighbor = TRUE)
+
+observed_mvlclq_TMA30S1_R2C7 <- calculate_mvlclq_multi_image(
+  stanford_preprocessed_individual_image, weights_data_TMA30S1_R2C7,
+  type_column = "cell_cluster", point_type = "B", target_types = c("CD4T", "CD8T"),
+  capped = TRUE, capped_query_num = 2, occurr_prob_TMA30S1_R2C7)
+
+sim_results_TMA30S1_R2C7 <- simulate_multiscale_mvlclq_fast_downsample(
+  stanford_preprocessed_individual_image, weights_data_TMA30S1_R2C7, type_column = "cell_cluster",
+  point_type = "B", target_types = c("CD4T", "CD8T"), observed_mvlclq_TMA30S1_R2C7,
+  occurr_prob_TMA30S1_R2C7, image_column = "fov",
+  scales = c(50, 250, 500, 1000, 1500, 1750), 
+  coord_names = c("x_coordinate", "y_coordinate"), simulation_times = 999)
+```
+
+Results visualizations
+
+```r 
+trendline_plot <- plot_reference_query_interactions_multi_image_mean(
+  sim_results_TMA30S1_R2C7, stanford_preprocessed_individual_image, 
+  type_column = "cell_cluster", image = "TMA30S1_R2C7")
+
+heatmap_CD4T <- Scatter_Heatmap(
+  stanford_preprocessed_individual_image, type_column = "cell_cluster", sim_results_TMA30S1_R2C7, 
+  coords = c("x_coordinate", "y_coordinate"), scale = 1750, image_name = "TMA30S1_R2C7",
+  query_celltype = "CD4T", reference_celltype = "B", title = "B-CD4T SES Score", point_size = 1)
+
+heatmap_CD8T <- Scatter_Heatmap(
+  stanford_preprocessed_individual_image, type_column = "cell_cluster", sim_results_TMA30S1_R2C7,
+  coords = c("x_coordinate", "y_coordinate"), scale = 1750, image_name = "TMA30S1_R2C7",
+  query_celltype = "CD8T", reference_celltype = "B", title = "B-CD8T SES Score", point_size = 1)
+
+heatmap_CD4TCD8T <- Scatter_Heatmap(
+  stanford_preprocessed_individual_image, type_column = "cell_cluster", sim_results_TMA30S1_R2C7,
+  coords = c("x_coordinate", "y_coordinate"), scale = 1750, image_name = "TMA30S1_R2C7",
+  query_celltype = "CD4T_CD8T", reference_celltype = "B", title = "B-CD4T-CD8T SES Score", point_size = 1)
+
+trendline_plot | ((heatmap_CD4T | heatmap_CD8T) / (heatmap_CD4TCD8T | plot1))
+```
+
+<p align="center">
+  <img src="man/figures/TMA30S1_R7C1_Results.png" alt="weight_kernels" width="800">
+</p>
+
 We identified triple-cell-type aggregations that associate with statistically significant patient outcomes. 
 
 To be updated
