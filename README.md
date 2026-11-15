@@ -139,32 +139,11 @@ Multi-scale permutation is performed by constructing permutation squares with di
 Permutation Results:
 
 ```r
-# visualizations
-trendline_plot <- plot_reference_query_interactions_multi_image_mean(
-  sim_mLCLQ, sim_sce, type_column = "cell_type", image = "1")
-
-# visualize pairwise A-B aggregation SES scores
-heatmap_B <- Scatter_Heatmap(
-  sim_sce, type_column = "cell_type", sim_mLCLQ, 
-  coords = c("x_coord", "y_coord"), scale = 2000, image_name = "1", 
-  query_celltype = "B", reference_celltype = "A", title = "A-B SES Score", point_size = 1)
-
-# visualize pairwise A-C aggregation SES scores
-heatmap_C <- Scatter_Heatmap(
-  sim_sce, type_column = "cell_type", sim_mLCLQ, 
-  coords = c("x_coord", "y_coord"), scale = 2000, image_name = "1", 
-  query_celltype = "C", reference_celltype = "A", title = "A-C SES Score", point_size = 1)
-
-# visualize triple A-B-C aggregation SES scores
-heatmap_BC <- Scatter_Heatmap(
-  sim_sce, type_column = "cell_type", sim_mLCLQ, 
-  coords = c("x_coord", "y_coord"), scale = 2000, image_name = "1", 
-  query_celltype = "B_C", reference_celltype = "A", title = "A-B-C SES Score", point_size = 1)
-
-no_axes <- theme(axis.title = element_blank(), axis.text = element_blank(),
-                 axis.ticks = element_blank(), panel.grid = element_blank())
-
-trendline_plot | ((heatmap_B | heatmap_C) / (heatmap_BC | p1)) & no_axes
+ses_panel(sim_sce, sim_mLCLQ,
+          reference = "A", queries = c("B", "C"),
+          type_column = "cell_type",
+          coords = c("x_coord", "y_coord"),
+          scale = 2000, image_name = "1")
 ```
 We visualize the mean SES score for each interaction across multiple permutation scales as well as single-cell-level SES scores
 
@@ -250,31 +229,12 @@ sim_results_TMA30S1_R2C7 <- simulate_multiscale_mvlclq_fast_downsample(
   occurr_prob_TMA30S1_R2C7, image_column = "fov",
   scales = c(50, 250, 500, 1000, 1500, 1750), 
   coord_names = c("x_coordinate", "y_coordinate"), simulation_times = 999)
-```
 
-Results visualizations
-
-```r 
-trendline_plot <- plot_reference_query_interactions_multi_image_mean(
-  sim_results_TMA30S1_R2C7, stanford_preprocessed_individual_image, 
-  type_column = "cell_cluster", image = "TMA30S1_R2C7")
-
-heatmap_CD4T <- Scatter_Heatmap(
-  stanford_preprocessed_individual_image, type_column = "cell_cluster", sim_results_TMA30S1_R2C7, 
-  coords = c("x_coordinate", "y_coordinate"), scale = 1750, image_name = "TMA30S1_R2C7",
-  query_celltype = "CD4T", reference_celltype = "B", title = "B-CD4T SES Score", point_size = 1)
-
-heatmap_CD8T <- Scatter_Heatmap(
-  stanford_preprocessed_individual_image, type_column = "cell_cluster", sim_results_TMA30S1_R2C7,
-  coords = c("x_coordinate", "y_coordinate"), scale = 1750, image_name = "TMA30S1_R2C7",
-  query_celltype = "CD8T", reference_celltype = "B", title = "B-CD8T SES Score", point_size = 1)
-
-heatmap_CD4TCD8T <- Scatter_Heatmap(
-  stanford_preprocessed_individual_image, type_column = "cell_cluster", sim_results_TMA30S1_R2C7,
-  coords = c("x_coordinate", "y_coordinate"), scale = 1750, image_name = "TMA30S1_R2C7",
-  query_celltype = "CD4T_CD8T", reference_celltype = "B", title = "B-CD4T-CD8T SES Score", point_size = 1)
-
-trendline_plot | ((heatmap_CD4T | heatmap_CD8T) / (heatmap_CD4TCD8T | plot1))
+ses_panel(stanford_preprocessed_individual_image, sim_results_TMA30S1_R2C7,
+          reference = "B", queries = c("CD4T", "CD8T"),
+          type_column = "cell_cluster",
+          coords = c("x_coordinate", "y_coordinate"),
+          scale = 1750, image_name = "TMA30S1_R2C7")
 ```
 
 <p align="center">
@@ -284,6 +244,11 @@ trendline_plot | ((heatmap_CD4T | heatmap_CD8T) / (heatmap_CD4TCD8T | plot1))
 We identified triple-cell-type aggregations that associate with statistically significant patient outcomes. 
 
 To be updated
+
+Analyses use the Stanford triple-negative breast cancer cohort (MIBI-TOF spatial
+proteomics) from Ranek et al. (2026). Raw images and cell segmentation masks are
+available from the BioStudies BioImage Archive under accession
+[S-BIAD1507](https://www.ebi.ac.uk/biostudies/bioimages/studies/S-BIAD1507).
 
 ### Mouse Brain Thick Slice
 
@@ -295,3 +260,9 @@ To be updated
 
 ## License
 MANGO is licensed under the GNU General Public License v3.0 or any later version.
+
+## References
+
+Ranek, J. S., Greenwald, N. F., Goldston, M., Fullaway, C. C., Sowers, C., Kong, A., Mouron, S., Quintela-Fandino, M., West, R. B. & Angelo, M. The automated computational workflow QUICHE reveals structural definitions of antitumor responses in triple-negative breast cancer. *Nature Cancer* **7**, 451–468 (2026). https://doi.org/10.1038/s43018-026-01122-5
+
+
