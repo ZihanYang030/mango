@@ -147,7 +147,7 @@ no_axes <- theme(axis.title = element_blank(), axis.text = element_blank(),
 
 trendline_plot | ((heatmap_B | heatmap_C) / (heatmap_BC | p1)) & no_axes
 ```
-We visualize the mean SES score for each interaction across multiple permutation scales as well as single-cell-level SES scores \
+We visualize the mean SES score for each interaction across multiple permutation scales as well as single-cell-level SES scores
 
 <p align="center">
   <img src="man/figures/simulation_results_demo.png" alt="weight_kernels" width="900">
