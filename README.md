@@ -103,8 +103,7 @@ p_g + p_m + p_e
 
 Using Gaussian weight kernel as default, we then calculate the observed mLCLQ scores and perform permutation
 
-Here, we are interested in the spatial aggregations between A, B, and C cells \
-i.e. Do B and C cells aggregate around A cells?
+Here, we are interested in the spatial aggregations between A, B, and C cells (i.e. Do B and C cells aggregate around A cells?)
 
 ```r
 # calcualte observed mLCLQ scores
@@ -148,10 +147,13 @@ no_axes <- theme(axis.title = element_blank(), axis.text = element_blank(),
 
 trendline_plot | ((heatmap_B | heatmap_C) / (heatmap_BC | p1)) & no_axes
 ```
+We visualize the mean SES score for each interaction across multiple permutation scales as well as single-cell-level SES scores \
 
 <p align="center">
   <img src="man/figures/simulation_results_demo.png" alt="weight_kernels" width="900">
 </p>
+
+The trendline plot shows a summary of each interaction across different scales, the SES score spatial map shows where each aggregation is observed
 
 ## License
 MANGO is licensed under the GNU General Public License v3.0 or any later version.
