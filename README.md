@@ -187,19 +187,6 @@ a) cellular neighborhoods are frequently composed of multiple interacting cell t
 b) in noisy experimental datasets, constituent pairwise aggregations do not always co-occur with higher-order multi-cell-type aggregations
 - there is a need for a **direct** multi-cell-type aggregation identification, instead of inferring multi-cell-type aggregations from pairwise aggregations
 
-Two example simulation cases:
-
-
-<p align="center">
-  <img src="man/figures/simulation_results_demo_ABCfar.png" alt="weight_kernels" width="900">
-</p>
-
-<p align="center">
-  <img src="man/figures/simulation_results_demo_RingBAC.png" alt="weight_kernels" width="900">
-</p>
-
-
-
 ### Triple-Negative Breast Cancer
 
 We identified triple-cell-type aggregations that associate with statistically significant patient outcomes. 
