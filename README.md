@@ -28,7 +28,18 @@ library(MANGO)
 
 ## Quick Start
 
-### Visualization
+**Table of Content**
+- [Simulation](#simulation)
+- [Needs Statement](#then-why-is-there-a-need-for-mango-how-is-it-different-from-pairwise-methods)
+- [Triple-Negative Breast Cancer](#triple-negative-breast-cancer)
+- [Mouse Brain Thick Slice](#mouse-brain-thick-slice)
+- [Alzheimer Mouse Brain](#alzheimer-mouse-brain)
+
+### Simulation
+
+Let's start from the basic - idealized simulation data
+
+**Visualization**
 
 Visualize a simulated section.
 ```r
@@ -50,7 +61,7 @@ p1 + p2
   <img src="man/figures/simulation_viz.png" alt="simulation_viz" width="800">
 </p>
 
-### Build Neighborhoods
+**Build Neighborhoods**
 
 Here, we show an example knn neighborhoods built with k = 35, three weight kernels available.
 
@@ -99,11 +110,12 @@ p_g + p_m + p_e
   <img src="man/figures/weight_kernels.png" alt="weight_kernels" width="800">
 </p>
 
-## Calculate observed mLCLQ score & Multi-Scale Permutation
+**Calculate observed mLCLQ score & Multi-Scale Permutation**
 
 Using Gaussian weight kernel as default, we then calculate the observed mLCLQ scores and perform permutation
 
-Here, we are interested in the spatial aggregations between A, B, and C cells (i.e. Do B and C cells aggregate around A cells?)
+Here, we are interested in the spatial aggregations between A, B, and C cells (i.e. Do B and C cells aggregate around A cells?) \
+Setting A as the reference cell type, B and C as the query cell types, we compute observed mLCLQ scores for the references and perform multi-scale permutation testing. 
 
 ```r
 # calcualte observed mLCLQ scores
@@ -160,7 +172,47 @@ We visualize the mean SES score for each interaction across multiple permutation
   <img src="man/figures/simulation_results_demo.png" alt="weight_kernels" width="900">
 </p>
 
-The trendline plot shows a summary of each interaction across different scales; the SES score spatial map shows where each aggregation is observed: high SES scores (yellow) represent aggregations, low SES scores (blue) represent repulsions. 
+The trendline plot shows a summary of each interaction across different scales; the SES score spatial map shows where each aggregation is observed: high SES scores (yellow) represent aggregations, low SES scores (blue) represent repulsions. \
+We benchmarked MANGO's power and false discovery rate against pairwise methods across 273 simulation cases (100 replicates each), and assessed its sensitivity to 7 background proportions and 3 neighborhood sizes (k).
+
+Apparently, in this simulated section, both the triple-cell-type aggregation and its constituent pairwise aggregations are present
+
+### Then why is there a need for MANGO? How is it different from pairwise methods?
+
+In biological tissue structures: 
+
+a) cellular neighborhoods are frequently composed of multiple interacting cell types, such as tertiary lymphoid structures, immunosuppressive neighborhoods, alveolar parenchyma, etc. 
+- there is a need for multi-cell-type aggregation identification 
+
+b) in noisy experimental datasets, constituent pairwise aggregations do not always co-occur with higher-order multi-cell-type aggregations
+- there is a need for a **direct** multi-cell-type aggregation identification, instead of inferring multi-cell-type aggregations from pairwise aggregations
+
+Two example simulation cases:
+
+
+<p align="center">
+  <img src="man/figures/simulation_results_demo_ABCfar.png" alt="weight_kernels" width="900">
+</p>
+
+<p align="center">
+  <img src="man/figures/simulation_results_demo_RingBAC.png" alt="weight_kernels" width="900">
+</p>
+
+
+
+### Triple-Negative Breast Cancer
+
+We identified triple-cell-type aggregations that associate with statistically significant patient outcomes. 
+
+To be updated
+
+### Mouse Brain Thick Slice
+
+To be updated
+
+### Alzheimer Mouse Brain
+
+To be updated
 
 ## License
 MANGO is licensed under the GNU General Public License v3.0 or any later version.
