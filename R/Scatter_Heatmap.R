@@ -1,5 +1,5 @@
 #' plotting function for single-cell-level SES scores and expression levels
-#' 
+#'
 #' @param sce_obj SpatialExperiment or SingleCellExperiment object in the original simulation cell order
 #' @param type_column Column name for cell type
 #' @param simulation_results multi-scale single-cell level simulation results
@@ -38,24 +38,24 @@ Scatter_Heatmap <- function(sce_obj, type_column, simulation_results, coords = c
     cell_data <- colData(sce_obj)
     coords_data <- spatialCoords(sce_obj)
     if (ncol(coords_data) < 2L) stop("At least two spatial coordinates are required")
-    
+
     x_coord <- coords_data[, 1]
     y_coord <- coords_data[, 2]
-    
+
   } else if (is(sce_obj, "SingleCellExperiment")) {
 
     cell_data <- colData(sce_obj)
     if (!all(coords %in% colnames(cell_data))) {stop("Specified coordinates not found in colData")}
-    
+
     x_coord <- cell_data[[coords[1L]]]
     y_coord <- cell_data[[coords[2L]]]
-    
+
   } else {
     stop("please input a SpatialExperiment or SingleCellExperiment")
   }
-  
+
   expression_requested <- any(!is.null(expression_celltype), !is.null(target_gene), !is.null(expression_matrix))
-  
+
   if (expression_requested &&
       (is.null(cell_name) ||
        is.null(expression_celltype) ||
@@ -63,11 +63,11 @@ Scatter_Heatmap <- function(sce_obj, type_column, simulation_results, coords = c
        is.null(expression_matrix))) {
     stop("pls provide cell_name, expression_celltype, target_gene, and expression_matrix together")
   }
-  
+
   # cell_types <- colData(sce_obj)[[type_column]]
   if (!type_column %in% colnames(cell_data)) stop("type_column not found in colData")
   cell_types <- cell_data[[type_column]]
-  
+
   #ses_scores from simulation results
   image_name <- as.character(image_name)
   scale <- as.character(scale)
@@ -76,15 +76,15 @@ Scatter_Heatmap <- function(sce_obj, type_column, simulation_results, coords = c
   image_result <- simulation_results[["results_by_image"]][[image_name]]
   if (is.null(image_result)) stop("image_name not found")
   ses_scores <- image_result[["results_by_scale"]][[scale]][["interactions"]][[query_celltype]][["ses_scores"]]
-  
+
   if (is.null(ses_scores)) {stop("no ses-scores detected")}
-  
+
   #plot_data <- data.frame( x = x_coord, y = y_coord, cell_type = as.factor(cell_types))
   plot_data <- data.frame(x = x_coord, y = y_coord,
                           cell_type = as.factor(cell_types), ses_score = NA_real_)
-  
+
   if (is.null(reference_celltype)) { stop("no reference type provided") }
-  
+
   #ref_indices <- which(plot_data$cell_type == reference_celltype)
   ref_indices <- image_result[["point_indices"]]
 
@@ -104,10 +104,10 @@ Scatter_Heatmap <- function(sce_obj, type_column, simulation_results, coords = c
   if (expression_requested) {
     if (!cell_name %in% colnames(cell_data)) stop("cell_name not found in colData")
     plot_data$cell_id <- as.character(cell_data[[cell_name]])}
-  
+
   if (is.null(image_column) && length(simulation_results[["results_by_image"]]) > 1L) {
     stop("Provide image_column when simulation_results contains multiple images")}
-  
+
   if (!is.null(image_column)) {
     if (!image_column %in% colnames(cell_data)) stop("image_column not found in colData")
     image_mask <- !is.na(cell_data[[image_column]]) &
@@ -117,7 +117,7 @@ Scatter_Heatmap <- function(sce_obj, type_column, simulation_results, coords = c
   }
   plot_data <- plot_data[complete.cases(plot_data[c("x", "y", "cell_type")]),
                          , drop = FALSE]
-  
+
 
   if (!is.null(point_color) && length(point_color) < 2L) { stop("point_color must contain at least two colors") }
   color_palette <- if (is.null(point_color)) {
@@ -125,17 +125,17 @@ Scatter_Heatmap <- function(sce_obj, type_column, simulation_results, coords = c
   } else {
     grDevices::colorRampPalette(point_color)(256)
   }
-  
+
 
   if (is.null(title)) { title <- paste("Spatial Plot -", query_celltype, "SES-scores") }
-  
+
   #ses_scores_actual <- plot_data$ses_score[!is.na(plot_data$ses_score)]
   if (any(!is.finite(plot_data$ses_score[!is.na(plot_data$ses_score)]))) {
     stop("SES scores must be finite")
   }
   min_ses <- min(plot_data$ses_score, na.rm = TRUE)
   max_ses <- max(plot_data$ses_score, na.rm = TRUE)
-  
+
   if (expression_requested) {
     expression_plotdata <- plot_data[plot_data$cell_type %in% expression_celltype, , drop = FALSE]
     if (!target_gene %in% rownames(expression_matrix)) { stop("wrong gene name, change one")}
@@ -147,9 +147,9 @@ Scatter_Heatmap <- function(sce_obj, type_column, simulation_results, coords = c
     ))
     if (all(is.na(expression_plotdata$expression_level))) { stop("no expression to plot") }
   }
-  
+
   plot <- ggplot(plot_data, aes(x = x, y = y)) +
-    geom_point(data = plot_data[is.na(plot_data$ses_score), ], aes(x = x, y = y), 
+    geom_point(data = plot_data[is.na(plot_data$ses_score), ], aes(x = x, y = y),
                color = "#e8e8e8", size = point_size, alpha = 0.6) +
     geom_point(data = plot_data[!is.na(plot_data$ses_score), ], aes(x = x, y = y, color = ses_score),
                # size = point_size, alpha = 0.8) +
@@ -164,24 +164,29 @@ Scatter_Heatmap <- function(sce_obj, type_column, simulation_results, coords = c
       limits = c(min(-2, min_ses), max(0, max_ses)),
       oob = scales::squish,
       na.value = "#e8e8e8",
-      guide = guide_colorbar(direction = "horizontal", title.position = "top",
-        title.hjust = 0.5, barwidth = unit(0.6, "npc"), barheight = unit(0.35, "cm"))
+      guide = guide_colorbar(
+        direction = "vertical",
+        theme = theme(
+          legend.key.height = unit(4, "cm"), legend.key.width = unit(0.35, "cm"),
+          legend.title.position = "top", legend.title = element_text(hjust = 0.5)
+        )
+      )
     ) +
-    labs(title = title, x = coords[1], y = coords[2]) + 
+    labs(title = title, x = coords[1], y = coords[2]) +
     theme_minimal() +
     theme(
       aspect.ratio = NULL,
-      axis.text = element_text(size = 16),
-      axis.title = element_text(size = 20),
-      plot.title = element_text(size = 22, hjust = 0.5),
-      legend.title = element_text(size = 18),
-      legend.text = element_text(size = 14),
-      legend.position = "bottom"
+      axis.text = element_text(size = 10),
+      axis.title = element_text(size = 12),
+      plot.title = element_text(size = 12, hjust = 0.5),
+      legend.title = element_text(size = 12),
+      legend.text = element_text(size = 10),
+      legend.position = "right"
     ) +
-    coord_fixed(ratio = 1) 
-  
+    coord_fixed(ratio = 1)
+
   if(expression_requested) {
-    plot <- plot + ggnewscale::new_scale_color() + 
+    plot <- plot + ggnewscale::new_scale_color() +
       geom_point(data = expression_plotdata,
                  aes(x = x, y = y, color = expression_level),
                  size = point_size, alpha = 0.8) +
@@ -194,13 +199,15 @@ Scatter_Heatmap <- function(sce_obj, type_column, simulation_results, coords = c
         na.value = "#e8e8e8",
         guide = guide_colorbar(
           direction = "vertical",
-          title.position = "top",
-          title.hjust = 0.5,
-          barwidth = unit(0.35, "cm"),
-          barheight = unit(4, "cm")
+          theme = theme(
+            legend.key.width = unit(0.35, "cm"),
+            legend.key.height = unit(4, "cm"),
+            legend.title.position = "top",
+            legend.title = element_text(hjust = 0.5)
+          )
         )
-      ) 
+      )
   }
-  
+
   return(plot)
 }

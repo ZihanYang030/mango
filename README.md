@@ -54,6 +54,8 @@ p1 + p2
 
 Here, we show an example knn neighborhoods built with k = 35, three weight kernels available.
 
+Neighborhood is created around each type A cell. 
+
 ```r
 occurr_prob <- calculate_occurrence_probability_multi_image(sim_sce, type_column = "cell_type", image_column = "image_number")
 
@@ -95,6 +97,57 @@ p_g + p_m + p_e
 
 <p align="center">
   <img src="man/figures/weight_kernels.png" alt="weight_kernels" width="800">
+</p>
+
+## Calculate observed mLCLQ score & Multi-Scale Permutation
+
+Using Gaussian weight kernel as default, we then calculate the observed mLCLQ scores and perform permutation
+
+Here, we are interested in the spatial aggregations between A, B, and C cells \
+i.e. Do B and C cells aggregate around A cells?
+
+```r
+# calcualte observed mLCLQ scores
+obs_mLCLQ <- calculate_mvlclq_multi_image(
+  sim_sce, weight_g, type_column = "cell_type", point_type = "A", 
+  target_types = c("B", "C"), occurrence_probs = occurr_prob,
+  image_column = "image_number")
+
+# perform permutation, calculated SES scores from observed and permuted mLCLQ scores
+sim_mLCLQ <- simulate_multiscale_mvlclq_fast_downsample(
+  sim_sce, weight_g, type_column = "cell_type", 
+  point_type = "A", target_types = c("B", "C"),
+  obs_mLCLQ, occurr_prob, image_column = "image_number",
+  scales = c(50, 250, 500, 750, 1000, 1250, 1500, 1750, 2000),
+  coord_names = c("x_coord", "y_coord"))
+  
+# visualizations
+trendline_plot <- plot_reference_query_interactions_multi_image_mean(
+  sim_mLCLQ, sim_sce, type_column = "cell_type", image = "1")
+
+# visualize pairwise A-B aggregation SES scores
+heatmap_B <- Scatter_Heatmap(
+  sim_sce, type_column = "cell_type", sim_mLCLQ, 
+  coords = c("x_coord", "y_coord"), scale = 2000, image_name = "1", 
+  query_celltype = "B", reference_celltype = "A", title = "A-B SES Score", point_size = 1)
+
+# visualize pairwise A-C aggregation SES scores
+heatmap_C <- Scatter_Heatmap(
+  sim_sce, type_column = "cell_type", sim_mLCLQ, 
+  coords = c("x_coord", "y_coord"), scale = 2000, image_name = "1", 
+  query_celltype = "C", reference_celltype = "A", title = "A-C SES Score", point_size = 1)
+
+# visualize triple A-B-C aggregation SES scores
+heatmap_BC <- Scatter_Heatmap(
+  sim_sce, type_column = "cell_type", sim_mLCLQ, 
+  coords = c("x_coord", "y_coord"), scale = 2000, image_name = "1", 
+  query_celltype = "B_C", reference_celltype = "A", title = "A-B-C SES Score", point_size = 1)
+
+trendline_plot | ((heatmap_B | heatmap_C) / (heatmap_BC | p1)) + plot_layout(widths = c(1, 4))
+```
+
+<p align="center">
+  <img src="man/figures/simulation_results_demo.png" alt="weight_kernels" width="900">
 </p>
 
 ## License
