@@ -122,10 +122,10 @@ sim_mLCLQ <- simulate_multiscale_mvlclq_fast_downsample(
 ```
 Multi-scale permutation is performed by constructing permutation squares with different side lengths using each reference cell as the centric. 
 <p align="center">
-  <img src="man/figures/perm_scale_viz.png" alt="weight_kernels" width="900">
+  <img src="man/figures/perm_scale_viz.png" alt="weight_kernels" width="800">
 </p>
-
 Permutation Results:
+
 ```r
 # visualizations
 trendline_plot <- plot_reference_query_interactions_multi_image_mean(
