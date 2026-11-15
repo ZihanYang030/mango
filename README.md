@@ -26,6 +26,25 @@ remotes::install_github("ZihanYang030/MANGO")
 library(MANGO)
 ```
 
+## Quick Start
+```r
+library(MANGO)
+library(patchwork)
+
+# generate simulation data
+sim <- generate_alternative_circle_simulation(num_cells = 5000, circle_radius = 350)
+
+# build SingleCellExperiment object
+sim_sce <- build_sce(sim)
+
+p1 <- Plot_Basic(sim_sce, type_column = "cell_type", coords = c("x_coord", "y_coord"), point_size = 1)
+p2 <- Plot_Basic(sim_sce, type_column = "cell_type", highlight_celltypes = "A", coords = c("x_coord", "y_coord"), point_size = 1)
+
+p1 + p2 + plot_layout(axis_titles = "collect")
+```
+<p align="center">
+  <img src="man/figures/simulation_viz.png" alt="simulation_viz" width="800">
+</p>
+
 ## License
 MANGO is licensed under the GNU General Public License v3.0 or any later version.
-
