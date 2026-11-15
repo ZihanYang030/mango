@@ -29,11 +29,11 @@ library(MANGO)
 ## Quick Start
 
 **Table of Content**
-- [Simulation](#simulation)
-- [Needs Statement](#then-why-is-there-a-need-for-mango-how-is-it-different-from-pairwise-methods)
-- [Triple-Negative Breast Cancer](#triple-negative-breast-cancer)
-- [Mouse Brain Thick Slice](#mouse-brain-thick-slice)
-- [Alzheimer Mouse Brain](#alzheimer-mouse-brain)
+- [Simulation](#simulation) - Simple Demonstrations
+- [Needs Statement](#why-mango) - **Why MANGO?**
+- [Triple-Negative Breast Cancer](#triple-negative-breast-cancer) - Cohort-Level Analysis
+- [Mouse Brain Thick Slice](#mouse-brain-thick-slice) - Extension to 3D Data
+- [Alzheimer Mouse Brain](#alzheimer-mouse-brain) - Collocations with Pathological Protein Markers
 
 ### Simulation
 
@@ -156,6 +156,7 @@ We benchmarked MANGO's power and false discovery rate against pairwise methods a
 
 Apparently, in this simulated section, both the triple-cell-type aggregation and its constituent pairwise aggregations are present
 
+<a id="why-mango"></a>
 ### Then why is there a need for MANGO? How is it different from pairwise methods?
 
 In biological tissue structures: 
@@ -241,9 +242,17 @@ ses_panel(stanford_preprocessed_individual_image, sim_results_TMA30S1_R2C7,
   <img src="man/figures/TMA30S1_R7C1_Results.png" alt="weight_kernels" width="800">
 </p>
 
+At the cohort level, MANGO identified conserved spatial patterns across tissue sections (B-CD4T-CD8T). Although the triple-cell-type lymphocyte aggregations are commonly observed, their constitutive pairwise interactions are frequently absent, indicating the need for a **direct** triple-cell-type aggregation identification.
+
+<p align="center">
+  <img src="man/figures/BCD4TCD8T_foursamples.png" alt="weight_kernels" width="800">
+</p>
+
 We identified triple-cell-type aggregations that associate with statistically significant patient outcomes. 
 
-To be updated
+<p align="center">
+  <img src="man/figures/HarzardRatio_tnbc.png" alt="weight_kernels" width="400">
+</p>
 
 Analyses use the Stanford triple-negative breast cancer cohort (MIBI-TOF spatial
 proteomics) from Ranek et al. (2026). Raw images and cell segmentation masks are
@@ -252,7 +261,7 @@ available from the BioStudies BioImage Archive under accession
 
 ### Mouse Brain Thick Slice
 
-To be updated
+[Interactive 3D mouse brain visualization](https://zihanyang030.github.io/mango/man/figures/3DMouseBrain_Viz.html)
 
 ### Alzheimer Mouse Brain
 
