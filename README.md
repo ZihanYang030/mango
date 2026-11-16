@@ -211,25 +211,40 @@ plot2 <- Plot_Basic(stanford_preprocessed_individual_image,
 ```r
 # mango analysis pipeline
 
-occurr_prob_TMA30S1_R2C7 <- calculate_occurrence_probability_multi_image(
-  stanford_preprocessed_individual_image, type_column = "cell_cluster", image_column = "fov")
+occurr_prob_TMA30S1_R2C7 <- calculate_occurrence_probability_multi_image(stanford_preprocessed_individual_image, 
+                                                                         type_column = "cell_cluster", 
+                                                                         image_column = "fov")
 
-weights_data_TMA30S1_R2C7 <- compute_spatial_weights_multi_image(
-  stanford_preprocessed_individual_image, type_column = "cell_cluster", point_type = "B",
-  image_column = "fov", method = "k_nearest", k = 15,
-  coords = c("x_coordinate", "y_coordinate"), exclude_ref_as_neighbor = TRUE)
+weights_data_TMA30S1_R2C7 <- compute_spatial_weights_multi_image(stanford_preprocessed_individual_image, 
+                                                                 type_column = "cell_cluster", 
+                                                                 point_type = "B",
+                                                                 image_column = "fov", 
+                                                                 method = "k_nearest", 
+                                                                 k = 15,
+                                                                 coords = c("x_coordinate", "y_coordinate"), 
+                                                                 exclude_ref_as_neighbor = TRUE)
 
-observed_mvlclq_TMA30S1_R2C7 <- calculate_mvlclq_multi_image(
-  stanford_preprocessed_individual_image, weights_data_TMA30S1_R2C7,
-  type_column = "cell_cluster", point_type = "B", target_types = c("CD4T", "CD8T"),
-  capped = TRUE, capped_query_num = 2, occurr_prob_TMA30S1_R2C7)
+observed_mvlclq_TMA30S1_R2C7 <- calculate_mvlclq_multi_image(stanford_preprocessed_individual_image, 
+                                                             weights_data_TMA30S1_R2C7,
+                                                             type_column = "cell_cluster", 
+                                                             point_type = "B", 
+                                                             target_types = c("CD4T", "CD8T"),
+                                                             capped = TRUE, 
+                                                             capped_query_num = 2, 
+                                                             occurr_prob_TMA30S1_R2C7)
 
-sim_results_TMA30S1_R2C7 <- simulate_multiscale_mvlclq_fast_downsample(
-  stanford_preprocessed_individual_image, weights_data_TMA30S1_R2C7, type_column = "cell_cluster",
-  point_type = "B", target_types = c("CD4T", "CD8T"), observed_mvlclq_TMA30S1_R2C7,
-  occurr_prob_TMA30S1_R2C7, image_column = "fov",
-  scales = c(50, 250, 500, 1000, 1500, 1750), 
-  coord_names = c("x_coordinate", "y_coordinate"), simulation_times = 999)
+sim_results_TMA30S1_R2C7 <- simulate_multiscale_mvlclq_fast_downsample(stanford_preprocessed_individual_image, 
+                                                                       weights_data_TMA30S1_R2C7, 
+                                                                       type_column = "cell_cluster",
+                                                                       point_type = "B", 
+                                                                       target_types = c("CD4T", "CD8T"), 
+                                                                       observed_mvlclq_TMA30S1_R2C7,
+                                                                       occurr_prob_TMA30S1_R2C7, 
+                                                                       image_column = "fov",
+                                                                       scales = c(50, 250, 500, 1000, 1500, 1750),
+                                                                       coord_names = c("x_coordinate", "y_coordinate"), 
+                                                                       simulation_times = 999)
+
 
 ses_panel(stanford_preprocessed_individual_image, sim_results_TMA30S1_R2C7,
           reference = "B", queries = c("CD4T", "CD8T"),
@@ -245,13 +260,19 @@ ses_panel(stanford_preprocessed_individual_image, sim_results_TMA30S1_R2C7,
 At the cohort level, MANGO identified conserved spatial patterns across tissue sections (B-CD4T-CD8T). Although the triple-cell-type lymphocyte aggregations are commonly observed, their constitutive pairwise interactions are frequently absent, indicating the need for a **direct** triple-cell-type aggregation identification.
 
 <p align="center">
-  <img src="man/figures/BCD4TCD8T_foursamples.png" alt="weight_kernels" width="800">
+  <img src="man/figures/BCD4TCD8T_foursamples.png" alt="weight_kernels" width="900">
 </p>
 
-We identified triple-cell-type aggregations that associate with statistically significant patient outcomes. 
+MANGO identified triple-cell-type aggregations are associate with statistically significant patient outcomes. 
 
 <p align="center">
   <img src="man/figures/HarzardRatio_tnbc.png" alt="weight_kernels" width="400">
+</p>
+
+Survival plots panel:
+
+<p align="center">
+  <img src="man/figures/TNBC_SurvivalPlots.png" alt="weight_kernels" width="900">
 </p>
 
 Analyses use the Stanford triple-negative breast cancer cohort (MIBI-TOF spatial
@@ -261,7 +282,13 @@ available from the BioStudies BioImage Archive under accession
 
 ### Mouse Brain Thick Slice
 
-[Interactive 3D mouse brain visualization](https://zihanyang030.github.io/mango/man/figures/3DMouseBrain_Viz.html)
+MANGO is compatible for 3-dimensional datasets.
+
+In 3D datasets, instead of permutation squares, MANGO constructs permutation cubes using each reference cell as the centroid. 
+
+<p align="center">
+  <img src="man/figures/MouseBrain_SpatialPlot.png" alt="weight_kernels" width="800">
+</p>
 
 ### Alzheimer Mouse Brain
 
