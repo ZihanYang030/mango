@@ -337,28 +337,18 @@ occurr_prob <- calculate_occurrence_probability_multi_image(
 ```
 <p align="center">
 
-| Cell type | Abbreviation | N      | % |
-|---|---|--------|---|
-| Astrocytes | AC | 21,924 | 11.04 |
-| Cholinergic and monoaminergic neurons | CHOMA | 2,864  | 1.44 |
-| Choroid plexus epithelial cells | CHOR | 2,959  | 1.49 |
-| Dentate gyrus granule neurons | DGGRC | 4,377  | 2.20 |
-| Di- and mesencephalon excitatory neurons | DEMEGLU | 17,748 | 8.93 |
-| Di- and mesencephalon inhibitory neurons | DEMEINH | 4,251  | 2.14 |
-| Ependymal cells | EPEN | 1,466  | 0.74 |
-| Microglia | MGL | 11,983 | 6.03 |
-| Non-glutamatergic neuroblasts | NGNBL | 1,727  | 0.87 |
-| Oligodendrocyte precursor cells | OPC | 7,806  | 3.93 |
-| Oligodendrocytes | OLG | 29,754 | 14.98 |
-| Peptidergic neurons | PEP | 9,212  | 4.64 |
-| Pericytes | PER | 10,929 | 5.50 |
-| Telencephalon inhibitory interneurons | TEINH | 10,694 | 5.38 |
-| Telencephalon projecting excitatory neurons | TEGLU | 45,592 | 22.95 |
-| Telencephalon projecting inhibitory neurons | MSN | 6,530  | 3.29 |
-| Vascular and leptomeningeal cells | VLM | 1,449  | 0.73 |
-| Vascular endothelial cells | VEN | 5,738  | 2.89 |
-| Vascular smooth muscle cells | VSM | 1,672  | 0.84 |
-
+| Cell type | Abbr. | N | % | Cell type | Abbr. | N | % |
+|---|---|---|---|---|---|---|---|
+| Astrocytes | AC | 21,924 | 11.04 | Oligodendrocytes | OLG | 29,754 | 14.98 |
+| Cholinergic and monoaminergic neurons | CHOMA | 2,864 | 1.44 | Peptidergic neurons | PEP | 9,212 | 4.64 |
+| Choroid plexus epithelial cells | CHOR | 2,959 | 1.49 | Pericytes | PER | 10,929 | 5.50 |
+| Dentate gyrus granule neurons | DGGRC | 4,377 | 2.20 | Telencephalon inhibitory interneurons | TEINH | 10,694 | 5.38 |
+| Di- and mesencephalon excitatory neurons | DEMEGLU | 17,748 | 8.93 | Telencephalon projecting excitatory neurons | TEGLU | 45,592 | 22.95 |
+| Di- and mesencephalon inhibitory neurons | DEMEINH | 4,251 | 2.14 | Telencephalon projecting inhibitory neurons | MSN | 6,530 | 3.29 |
+| Ependymal cells | EPEN | 1,466 | 0.74 | Vascular and leptomeningeal cells | VLM | 1,449 | 0.73 |
+| Microglia | MGL | 11,983 | 6.03 | Vascular endothelial cells | VEN | 5,738 | 2.89 |
+| Non-glutamatergic neuroblasts | NGNBL | 1,727 | 0.87 | Vascular smooth muscle cells | VSM | 1,672 | 0.84 |
+| Oligodendrocyte precursor cells | OPC | 7,806 | 3.93 |  |  |  |  |
 </p>
 
 Total: 198,675 cells
@@ -422,6 +412,7 @@ gene expression matrices and cell metadata are available from Zenodo under acces
 ### Alzheimer Mouse Brain
 Data processing: we combine the plaque index & location matrix with that of the cells for joint layout in the same image
 
+Use sample `13months-disease-replicate_2` as an example
 ```r
 # read in coordinates for cell and plaque locations (stored separately)
 spatial_13months_disease_replicate_2 <- read.csv("spatial_13months-disease-replicate_2.csv")
@@ -494,7 +485,9 @@ plot2 <- Plot_Basic(sce_combined_13months_disease_replicate_2,
 
 plot1 + plot2
 ```
-
+<p align="center">
+  <img src="man/figures/mousebrain_alzheimer_viz.png" alt="weight_kernels" width="500">
+</p>
 
 Analyses use the STARmap PLUS dataset from a mouse model of Alzheimer's disease from Zeng et al. (2023). Processed expression matrices and cell annotations
 are available from Zenodo under [10.5281/zenodo.7332091](https://doi.org/10.5281/zenodo.7332091).
