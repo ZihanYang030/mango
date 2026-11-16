@@ -550,6 +550,11 @@ Based on MANGO detection results, Aβ plaque neighborhoods are classified as eit
 
 Cells within Aβ plaque neighborhoods are classified based on the significance label their resident neighborhoods receive. As neighborhoods may overlap, cells were classified within a significant Aβ plaque neighborhood if at least one resident neighborhood showed significant `Aβ plaque-Astro-Micro-Oligo` aggregation.
 
+<p align="center">
+  <img src="man/figures/Alzheimer_Cells.png" alt="weight_kernels" width="800">
+</p>
+Created with BioRender.com
+
 We use MANGO to detect the significant pairwise aggregations within each cell class and visualized them in a chord diagram.
 
 <p align="center">
