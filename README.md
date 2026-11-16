@@ -171,10 +171,10 @@ Apparently, in this simulated section, both the triple-cell-type aggregation and
 In biological tissue structures: 
 
 a) cellular neighborhoods are frequently composed of multiple interacting cell types; such neighborhoods include tertiary lymphoid structures, immunosuppressive neighborhoods, alveolar parenchyma, etc. 
-- there is a need for multi-cell-type aggregation identification 
+- there is a need for multi-cell-type aggregation detection 
 
 b) in noisy experimental datasets, constituent pairwise aggregations do not always co-occur with higher-order multi-cell-type aggregations
-- there is a need for a **direct** multi-cell-type aggregation identification, instead of inferring multi-cell-type aggregations from pairwise aggregations
+- there is a need for a **direct** multi-cell-type aggregation detection, instead of inferring multi-cell-type aggregations from pairwise aggregations
 
 ### Triple-Negative Breast Cancer
 
@@ -182,7 +182,7 @@ b) in noisy experimental datasets, constituent pairwise aggregations do not alwa
 
 ```r
 # read in data
-stanford_preprocessed <- readH5AD("/File/Path/to/stanford_preprocessed.h5ad")
+stanford_preprocessed <- readH5AD("stanford_preprocessed.h5ad")
 
 # extract coordinates
 spatial_coords <- stanford_preprocessed@int_colData@listData[["reducedDims"]]@listData[["spatial"]]
@@ -266,13 +266,17 @@ ses_panel(stanford_preprocessed_individual_image, sim_results_TMA30S1_R2C7,
   <img src="man/figures/TMA30S1_R7C1_Results.png" alt="weight_kernels" width="800">
 </p>
 
-At the cohort level, MANGO identified conserved spatial patterns across tissue sections (B-CD4T-CD8T). Although the triple-cell-type lymphocyte aggregations are commonly observed, their constitutive pairwise interactions are frequently absent, indicating the need for a **direct** triple-cell-type aggregation identification.
+At the cohort level, MANGO detected conserved spatial patterns across tissue sections (B-CD4T-CD8T). Although the triple-cell-type lymphocyte aggregations are commonly observed, their constitutive pairwise interactions are frequently absent, indicating the need for a **direct** triple-cell-type aggregation detection.
 
 <p align="center">
   <img src="man/figures/BCD4TCD8T_foursamples.png" alt="weight_kernels" width="900">
 </p>
 
-In addition to multi-scale permutation, we performed permutation across the full tissue section and obtain a tissue-section level p-value for statistic significance determination.
+In addition to multi-scale permutation, we used [`simulate_mvlclq_global_core`](R/simulate_mvlclq_global_core.R)to perform permutation across the full tissue section and obtain a tissue-section level p-value for statistic significance determination.
+
+For computational efficiency, we permuted and saved all cell labels, then used these shared permutations to calculate all interaction results.
+
+Shown here is an example for a single-section permutation, where a tissue-level p-value is computed for the specified interaction (B-CD4T-CD8T).
 
 ```r
 full_tissue_perm <- simulate_mvlclq_global_core(
@@ -287,13 +291,13 @@ full_tissue_perm <- simulate_mvlclq_global_core(
   coord_names = c("x_coordinate", "y_coordinate"))
 ```
 
-MANGO identified triple-cell-type aggregations are associate with statistically significant patient outcomes. 
+MANGO-detected triple-cell-type aggregations associate with statistically significantly different patient outcomes. 
 
 <p align="center">
   <img src="man/figures/HarzardRatio_tnbc.png" alt="weight_kernels" width="400">
 </p>
 
-Survival plots with log-rank p-values labeled:
+Patients were stratified into two groups, with MANGO-detected neighborhoods present (red curve) or absent (blue curve). Survival plots with log-rank p-values labeled:
 
 <p align="center">
   <img src="man/figures/TNBC_SurvivalPlots.png" alt="weight_kernels" width="900">
@@ -315,8 +319,8 @@ In 3D datasets, instead of permutation squares, MANGO constructs permutation cub
 </p>
 
 ```r
-Brain_Deep_STARmap_spatial <- read.csv("/File/Path/to/Brain_Deep_STARmap_spatial.csv")
-Brain_Deep_STARmap_expression_matrix <- read.csv("/File/Path/to/Brain_Deep_STARmap_expression_matrix.csv")
+Brain_Deep_STARmap_spatial <- read.csv("Brain_Deep_STARmap_spatial.csv")
+Brain_Deep_STARmap_expression_matrix <- read.csv("Brain_Deep_STARmap_expression_matrix.csv")
 
 expr_matrix <- as(t(as.matrix(Brain_Deep_STARmap_expression_matrix)), "sparseMatrix")
 
@@ -486,7 +490,97 @@ plot2 <- Plot_Basic(sce_combined_13months_disease_replicate_2,
 plot1 + plot2
 ```
 <p align="center">
-  <img src="man/figures/mousebrain_alzheimer_viz.png" alt="weight_kernels" width="500">
+  <img src="man/figures/mousebrain_alzheimer_viz.png" alt="weight_kernels" width="800">
+</p>
+
+Interested in the aggregation of astrocytes, microglia, and oligodendrocytes around Aβ Plaque, we set Aβ Plaque as the reference, the three cell types as query types
+
+```r
+occurrence_data_13months <- calculate_occurrence_probability_multi_image(sce_combined_13months_disease_replicate_2,
+                                                                         type_column = "top_level_cell_type",
+                                                                         image_column = "label")
+
+weights_data_13months <- compute_spatial_weights_multi_image(sce_combined_13months_disease_replicate_2,
+                                                             type_column = "top_level_cell_type",
+                                                             point_type = "Aβ Plaque",
+                                                             image_column = "label",
+                                                             method = "k_nearest",
+                                                             k = 100,
+                                                             coords = c("X_scaled", "Y_scaled"),
+                                                             exclude_ref_as_neighbor = FALSE)
+
+observed_mvlclq_13months <- calculate_mvlclq_multi_image(sce_combined_13months_disease_replicate_2,
+                                                         weights_data_13months,
+                                                         type_column = "top_level_cell_type",
+                                                         point_type = "Aβ Plaque",
+                                                         target_types = c("Astro", "Oligo", "Micro"),
+                                                         capped = TRUE,
+                                                         capped_query_num = 3,
+                                                         occurrence_data_13months)
+
+simulation_results_13months <- simulate_multiscale_mvlclq_fast_downsample(sce_combined_13months_disease_replicate_2,
+                                                                          weights_data_13months,
+                                                                          type_column = "top_level_cell_type",
+                                                                          point_type = "Aβ Plaque",
+                                                                          target_types = c("Astro", "Oligo", "Micro"),
+                                                                          observed_mvlclq_13months,
+                                                                          occurrence_data_13months,
+                                                                          image_column = "label",
+                                                                          scales = c(250, 500, 750, 1000, 1250, 1500, 1750, 2000),
+                                                                          simulation_times = 999)
+                                                                          
+
+trendline <- plot_reference_query_interactions_multi_image_mean(
+  simulation_results_13months,
+  sce_combined_13months_disease_replicate_2, 
+  type_column = "top_level_cell_type",
+  image = "13months-disease-replicate_2",
+  cell_subset = "Aβ Plaque")
+
+plot2 + trendline
+```
+
+<p align="center">
+  <img src="man/figures/AlzheimerMouseBrain_trendline.png" alt="weight_kernels" width="800">
+</p>
+
+We stratified cells based on their relative locations to Aβ plaque neighborhoods. First, cells are stratified into inside or outside of the constructed Aβ plaque neighborhoods. 
+
+Based on MANGO detection results, Aβ plaque neighborhoods are classified as either with or without `Aβ plaque-Astro-Micro-Oligo` aggregations. 
+
+Cells within Aβ plaque neighborhoods are classified based on the significance label their resident neighborhoods receive. As neighborhoods may overlap, cells were classified within a significant Aβ plaque neighborhood if at least one resident neighborhood showed significant `Aβ plaque-Astro-Micro-Oligo` aggregation.
+
+We use MANGO to detect the significant pairwise aggregations within each cell class and visualized them in a chord diagram.
+
+<p align="center">
+  <img src="man/figures/AlzheimerCirclePlot.png" alt="weight_kernels" width="500">
+</p>
+
+We performed Differentially Expression Gene Analysis using Seurat `FindMarkers` function and have detected genes whose expression levels are significantly different between different cell classes (inside vs outside of Aβ Plaque neighborhoods; inside significant vs insignificant Aβ Plaque neighborhoods)
+
+Example Expression Plot ([Mbp](https://www.informatics.jax.org/marker/MGI:96925) Expression Levels in Oligodendrocytes; blue color scale - SES score, quantifies `Aβ Plaque-Astro-Micro-Oligo`aggregation; red color scale - [Mbp](https://www.informatics.jax.org/marker/MGI:96925) expression level in oligodendrocytes):
+
+```r
+expr_mat <- read.csv("expression_matrix_normalized.csv")
+
+ScatterHeatmap <- Scatter_Heatmap(sce_combined_13months_disease_replicate_2, 
+                                  type_column = "top_level_cell_type",
+                                  simulation_results_13months, 
+                                  coords = c("X_scaled", "Y_scaled"),
+                                  cell_name = "NAME",
+                                  scale = 2000,
+                                  image_name = "13months-disease-replicate_2",
+                                  query_celltype = "Astro_Micro_Oligo", 
+                                  expression_celltype = "Oligo",
+                                  target_gene = "Mbp", 
+                                  expr_mat,
+                                  reference_celltype = "Aβ Plaque",
+                                  point_size = 1.5)
+print(ScatterHeatmap)
+```
+
+<p align="center">
+  <img src="man/figures/Mbp_Oligo.png" alt="weight_kernels" width="300">
 </p>
 
 Analyses use the STARmap PLUS dataset from a mouse model of Alzheimer's disease from Zeng et al. (2023). Processed expression matrices and cell annotations
@@ -502,3 +596,34 @@ Ranek, J. S., Greenwald, N. F., Goldston, M., Fullaway, C. C., Sowers, C., Kong,
 Sui, X., Lo, J.A., Luo, S. et al. Scalable spatial single-cell transcriptomics and translatomics in 3D thick tissue blocks. Nat Methods 22, 2574–2584 (2025). https://doi.org/10.1038/s41592-025-02867-0
 
 Zeng, H., Huang, J., Zhou, H. et al. Integrative in situ mapping of single-cell transcriptional states and tissue histopathology in a mouse model of Alzheimer’s disease. Nat Neurosci 26, 430–446 (2023). https://doi.org/10.1038/s41593-022-01251-x
+
+Mouse Genome Informatics. *Mbp* (myelin basic protein), MGI:96925. Mouse Genome
+Database (MGD), The Jackson Laboratory, Bar Harbor, Maine.
+https://www.informatics.jax.org/marker/MGI:96925 (accessed 16 November 2026).
+
+Butler, A., Hoffman, P., Smibert, P., Papalexi, E. & Satija, R. Integrating
+single-cell transcriptomic data across different conditions, technologies, and
+species. *Nature Biotechnology* **36**, 411–420 (2018).
+https://doi.org/10.1038/nbt.4096
+
+dos Santos Peixoto, R., Miller, B. F., Brusko, M. A., Aihara, G., Atta, L.,
+Anant, M., Atkinson, M. A., Brusko, T. M., Wasserfall, C. H. & Fan, J.
+Characterizing cell-type spatial relationships across length scales in spatially
+resolved omics data. *Nature Communications* **16**, 350 (2025).
+https://doi.org/10.1038/s41467-024-55700-1
+
+Morueta-Holme, N., Blonder, B., Sandel, B., McGill, B. J., Peet, R. K., Ott, J. E.,
+Violle, C., Enquist, B. J., Jørgensen, P. M. & Svenning, J.-C. A network approach
+for inferring species associations from co-occurrence data. *Ecography* **39**,
+1139–1150 (2016). https://doi.org/10.1111/ecog.01892
+
+Gotelli, N. J. & McCabe, D. J. Species co-occurrence: a meta-analysis of
+J. M. Diamond's assembly rules model. *Ecology* **83**, 2091–2096 (2002).
+
+Baddeley, A. & Turner, R. spatstat: An R package for analyzing spatial point
+patterns. *Journal of Statistical Software* **12**(6), 1–42 (2005).
+https://doi.org/10.18637/jss.v012.i06
+
+Cai, F., Chen, J., Chen, T., Zhang, B. & Fan, W. Mining significant local spatial
+association rules for multi-category point data. *Heliyon* **10**, e25047 (2024).
+https://doi.org/10.1016/j.heliyon.2024.e25047
