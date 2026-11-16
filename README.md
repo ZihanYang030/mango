@@ -420,6 +420,81 @@ gene expression matrices and cell metadata are available from Zenodo under acces
 [10.5281/zenodo.16783355](https://doi.org/10.5281/zenodo.16783355).
 
 ### Alzheimer Mouse Brain
+Data processing: we combine the plaque index & location matrix with that of the cells for joint layout in the same image
+
+```r
+# read in coordinates for cell and plaque locations (stored separately)
+spatial_13months_disease_replicate_2 <- read.csv("spatial_13months-disease-replicate_2.csv")
+plaque_13months_disease_replicate_2 <- read.csv("plaque_13months-disease-replicate_2.csv")
+
+spatial_13months_disease_replicate_2 <- spatial_13months_disease_replicate_2[-1, ]
+
+spatial_13months_disease_replicate_2$X_scaled <- as.numeric(spatial_13months_disease_replicate_2$X.scaled)
+spatial_13months_disease_replicate_2$Y_scaled <- as.numeric(spatial_13months_disease_replicate_2$Y.scaled)
+spatial_13months_disease_replicate_2$X.scaled <- NULL
+spatial_13months_disease_replicate_2$Y.scaled <- NULL
+spatial_13months_disease_replicate_2$X <- as.numeric(spatial_13months_disease_replicate_2$X)
+spatial_13months_disease_replicate_2$Y <- as.numeric(spatial_13months_disease_replicate_2$Y)
+
+# massage the plaque matrix into cell matrix's format
+plaque_cell_type <- rep("Aβ Plaque", times = length(plaque_13months_disease_replicate_2$m.cx))
+plaque_df <- cbind(plaque_13months_disease_replicate_2$m.cx,
+                   plaque_13months_disease_replicate_2$m.cy,
+                   plaque_13months_disease_replicate_2$plaque_id,
+                   plaque_cell_type)
+plaque_df <- as.data.frame(plaque_df)
+colnames(plaque_df) <- c("X_scaled", "Y_scaled", "plaque_id", "top_level_cell_type")
+
+plaque_df_prepared <- data.frame(
+  NAME = plaque_df$plaque_id,
+  X = as.numeric(plaque_df$X_scaled),
+  Y = as.numeric(plaque_df$Y_scaled),
+  X_scaled = as.numeric(plaque_df$X_scaled),
+  Y_scaled = as.numeric(plaque_df$Y_scaled),
+  label = "13months-disease-replicate_2",
+  top_level_cell_type = plaque_df$top_level_cell_type,
+  sub_level_cell_type = plaque_df$top_level_cell_type,
+  stringsAsFactors = FALSE
+)
+
+# combine plaque and cell dataframes
+combined_data <- rbind(spatial_13months_disease_replicate_2, plaque_df_prepared)
+
+if(any(duplicated(combined_data$NAME))) { # plaque ID should not be duplicates of cell ID - dedup
+  warning("There are still duplicate NAMEs!")
+  print(combined_data$NAME[duplicated(combined_data$NAME)])
+}
+
+rownames(combined_data) <- combined_data$NAME
+
+sce_combined_13months_disease_replicate_2 <- SingleCellExperiment(
+  colData = combined_data,
+  reducedDims = list(
+    spatial = as.matrix(combined_data[, c("X_scaled", "Y_scaled")])
+  )
+)
+```
+
+Visualization
+
+```r
+plot1 <- Plot_Basic(sce_combined_13months_disease_replicate_2, 
+                   type_column = "top_level_cell_type",
+                   highlight_celltypes = NULL,
+                   coords = c("X_scaled", "Y_scaled"),
+                   title = "Mouse Brain - Alzheimer",
+                   point_size = 1.5)
+
+plot2 <- Plot_Basic(sce_combined_13months_disease_replicate_2, 
+                   type_column = "top_level_cell_type",
+                   highlight_celltypes = c("Aβ Plaque", "LHb"),
+                   coords = c("X_scaled", "Y_scaled"),
+                   title = "Mouse Brain - Alzheimer",
+                   point_size = 1.5)
+
+plot1 + plot2
+```
+
 
 Analyses use the STARmap PLUS dataset from a mouse model of Alzheimer's disease from Zeng et al. (2023). Processed expression matrices and cell annotations
 are available from Zenodo under [10.5281/zenodo.7332091](https://doi.org/10.5281/zenodo.7332091).
