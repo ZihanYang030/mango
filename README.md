@@ -337,27 +337,27 @@ occurr_prob <- calculate_occurrence_probability_multi_image(
 ```
 <p align="center">
 
-| Cell type | Abbreviation | N | % |
-|---|:---|---:|---:|
+| Cell type | Abbreviation | N      | % |
+|---|---|--------|---|
 | Astrocytes | AC | 21,924 | 11.04 |
-| Cholinergic and monoaminergic neurons | CHOMA | 2,864 | 1.44 |
-| Choroid plexus epithelial cells | CHOR | 2,959 | 1.49 |
-| Dentate gyrus granule neurons | DGGRC | 4,377 | 2.20 |
+| Cholinergic and monoaminergic neurons | CHOMA | 2,864  | 1.44 |
+| Choroid plexus epithelial cells | CHOR | 2,959  | 1.49 |
+| Dentate gyrus granule neurons | DGGRC | 4,377  | 2.20 |
 | Di- and mesencephalon excitatory neurons | DEMEGLU | 17,748 | 8.93 |
-| Di- and mesencephalon inhibitory neurons | DEMEINH | 4,251 | 2.14 |
-| Ependymal cells | EPEN | 1,466 | 0.74 |
+| Di- and mesencephalon inhibitory neurons | DEMEINH | 4,251  | 2.14 |
+| Ependymal cells | EPEN | 1,466  | 0.74 |
 | Microglia | MGL | 11,983 | 6.03 |
-| Non-glutamatergic neuroblasts | NGNBL | 1,727 | 0.87 |
-| Oligodendrocyte precursor cells | OPC | 7,806 | 3.93 |
+| Non-glutamatergic neuroblasts | NGNBL | 1,727  | 0.87 |
+| Oligodendrocyte precursor cells | OPC | 7,806  | 3.93 |
 | Oligodendrocytes | OLG | 29,754 | 14.98 |
-| Peptidergic neurons | PEP | 9,212 | 4.64 |
+| Peptidergic neurons | PEP | 9,212  | 4.64 |
 | Pericytes | PER | 10,929 | 5.50 |
 | Telencephalon inhibitory interneurons | TEINH | 10,694 | 5.38 |
 | Telencephalon projecting excitatory neurons | TEGLU | 45,592 | 22.95 |
-| Telencephalon projecting inhibitory neurons | MSN | 6,530 | 3.29 |
-| Vascular and leptomeningeal cells | VLM | 1,449 | 0.73 |
-| Vascular endothelial cells | VEN | 5,738 | 2.89 |
-| Vascular smooth muscle cells | VSM | 1,672 | 0.84 |
+| Telencephalon projecting inhibitory neurons | MSN | 6,530  | 3.29 |
+| Vascular and leptomeningeal cells | VLM | 1,449  | 0.73 |
+| Vascular endothelial cells | VEN | 5,738  | 2.89 |
+| Vascular smooth muscle cells | VSM | 1,672  | 0.84 |
 
 </p>
 
@@ -412,7 +412,7 @@ heatmap_CD4T <- Scatter_Heatmap(
   point_size = 1)
 ```
 <p align="center">
-  <img src="man/figures/3D_MouseBrain_DEINH_AC_MGL_demo.png" alt="weight_kernels" width="800">
+  <img src="man/figures/3D_MouseBrain_DEINH_AC_MGL_demo.png" alt="weight_kernels" width="700">
 </p>
 
 Analyses use the mouse brain Deep-STARmap dataset from Sui et al. (2025). Processed
