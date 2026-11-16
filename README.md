@@ -11,11 +11,15 @@ MANGO defines the local microenvironment of each reference cell using a k-neares
 
 Schematic of mLCLQ calculation 
 
-For each reference cell, we compute local weighted proportions of the query types within neighborhoods using spatial weights and observed cell-type labels. The proportions are combined and divided by the global cell-type abundance to obtain an observed mLCLQ score. We then repeat the calculation with independently permuted labels produces null scores.
+For each reference cell, we compute local weighted proportions of the query types within neighborhoods using spatial weights and observed cell-type labels. The proportions are combined and divided by the global cell-type abundance to obtain an observed mLCLQ score. We then repeat the calculation with independently permuted labels to produce null scores. Using observed and null mLCLQ scores, we compute standardized effect size (SES) and tissue-section-level p-value to determine statistical significance. 
 
 <p align="center">
   <img src="man/figures/mango_algorithm.png" alt="MANGO algorithm" width="800">
 </p>
+
+**How to read mLCLQ**
+
+For the chosen query cell types, an observed mLCLQ score is computed for each reference cell. The score quantifies how strongly these query types co-occur in reference cells' neighborhoods. 
 
 MANGO is under active development. We appreciate any suggestions and feedback. Contact: [zy56@rice.edu](mailto:zy56@rice.edu). 
 
@@ -112,10 +116,11 @@ p_g + p_m + p_e
 
 **Calculate observed mLCLQ score & Multi-Scale Permutation**
 
-Using Gaussian weight kernel as default, we then calculate the observed mLCLQ scores and perform permutation
+Using Gaussian weight kernel as the default, we then calculate the observed mLCLQ scores and perform permutation
 
-Here, we are interested in the spatial aggregations between A, B, and C cells (i.e. Do B and C cells aggregate around A cells?) \
-Setting A as the reference cell type, B and C as the query cell types, we compute observed mLCLQ scores for the references and perform multi-scale permutation testing. 
+We are interested in the spatial aggregations between A, B, and C cells (i.e. Do B and C cells aggregate around A cells?) 
+
+We therefore set A as the reference cell type, B and C as the query cell types. Observed mLCLQ scores are computed for the references and permutation test was performed across multiple scales. 
 
 ```r
 # calcualte observed mLCLQ scores
@@ -145,6 +150,10 @@ ses_panel(sim_sce, sim_mLCLQ,
           coords = c("x_coord", "y_coord"),
           scale = 2000, image_name = "1")
 ```
+**How to read SES?** 
+
+At each permutation scale, MANGO compares a reference cell’s observed mLCLQ with the null mLCLQ scores computed from the permuted cell labels. The standardized enrichment score (SES) quantifies how far the observed score lies from the mean permuted score (relative to the variation among permutations). Positive SES indicates co-localization; negative SES indicates repulsion.
+
 We visualize the mean SES score for each interaction across multiple permutation scales as well as single-cell-level SES scores
 
 <p align="center">
@@ -161,7 +170,7 @@ Apparently, in this simulated section, both the triple-cell-type aggregation and
 
 In biological tissue structures: 
 
-a) cellular neighborhoods are frequently composed of multiple interacting cell types, such as tertiary lymphoid structures, immunosuppressive neighborhoods, alveolar parenchyma, etc. 
+a) cellular neighborhoods are frequently composed of multiple interacting cell types; such neighborhoods include tertiary lymphoid structures, immunosuppressive neighborhoods, alveolar parenchyma, etc. 
 - there is a need for multi-cell-type aggregation identification 
 
 b) in noisy experimental datasets, constituent pairwise aggregations do not always co-occur with higher-order multi-cell-type aggregations
@@ -263,13 +272,28 @@ At the cohort level, MANGO identified conserved spatial patterns across tissue s
   <img src="man/figures/BCD4TCD8T_foursamples.png" alt="weight_kernels" width="900">
 </p>
 
+In addition to multi-scale permutation, we performed permutation across the full tissue section and obtain a tissue-section level p-value for statistic significance determination.
+
+```r
+full_tissue_perm <- simulate_mvlclq_global_core(
+  stanford_preprocessed_individual_image,
+  weights_data_TMA30S1_R2C7,
+  type_column = "cell_cluster", 
+  point_type = "B", 
+  target_types = c("CD4T", "CD8T"), 
+  observed_mvlclq_TMA30S1_R2C7, 
+  occurr_prob_TMA30S1_R2C7,
+  image_column = "fov",
+  coord_names = c("x_coordinate", "y_coordinate"))
+```
+
 MANGO identified triple-cell-type aggregations are associate with statistically significant patient outcomes. 
 
 <p align="center">
   <img src="man/figures/HarzardRatio_tnbc.png" alt="weight_kernels" width="400">
 </p>
 
-Survival plots panel:
+Survival plots with log-rank p-values labeled:
 
 <p align="center">
   <img src="man/figures/TNBC_SurvivalPlots.png" alt="weight_kernels" width="900">
@@ -290,9 +314,112 @@ In 3D datasets, instead of permutation squares, MANGO constructs permutation cub
   <img src="man/figures/MouseBrain_SpatialPlot.png" alt="weight_kernels" width="800">
 </p>
 
+```r
+Brain_Deep_STARmap_spatial <- read.csv("/File/Path/to/Brain_Deep_STARmap_spatial.csv")
+Brain_Deep_STARmap_expression_matrix <- read.csv("/File/Path/to/Brain_Deep_STARmap_expression_matrix.csv")
+
+expr_matrix <- as(t(as.matrix(Brain_Deep_STARmap_expression_matrix)), "sparseMatrix")
+
+sce <- SingleCellExperiment(
+  assays = list(counts = expr_matrix),
+  colData = Brain_Deep_STARmap_spatial,
+  reducedDims = list(
+    spatial = as.matrix(Brain_Deep_STARmap_spatial[, c("x", "y", "z")])
+  )
+)
+
+sce@colData@listData[["image"]] <- rep(1, sce@colData@nrows)
+
+occurr_prob <- calculate_occurrence_probability_multi_image(
+  sce,
+  type_column = "FUSEmap_main_level",
+  image_column = "image")
+```
+
+| Cell type | Abbreviation | N | % |
+|---|:---|---:|---:|
+| Astrocytes | AC | 21,924 | 11.04 |
+| Cholinergic and monoaminergic neurons | CHOMA | 2,864 | 1.44 |
+| Choroid plexus epithelial cells | CHOR | 2,959 | 1.49 |
+| Dentate gyrus granule neurons | DGGRC | 4,377 | 2.20 |
+| Di- and mesencephalon excitatory neurons | DEMEGLU | 17,748 | 8.93 |
+| Di- and mesencephalon inhibitory neurons | DEMEINH | 4,251 | 2.14 |
+| Ependymal cells | EPEN | 1,466 | 0.74 |
+| Microglia | MGL | 11,983 | 6.03 |
+| Non-glutamatergic neuroblasts | NGNBL | 1,727 | 0.87 |
+| Oligodendrocyte precursor cells | OPC | 7,806 | 3.93 |
+| Oligodendrocytes | OLG | 29,754 | 14.98 |
+| Peptidergic neurons | PEP | 9,212 | 4.64 |
+| Pericytes | PER | 10,929 | 5.50 |
+| Telencephalon inhibitory interneurons | TEINH | 10,694 | 5.38 |
+| Telencephalon projecting excitatory neurons | TEGLU | 45,592 | 22.95 |
+| Telencephalon projecting inhibitory neurons | MSN | 6,530 | 3.29 |
+| Vascular and leptomeningeal cells | VLM | 1,449 | 0.73 |
+| Vascular endothelial cells | VEN | 5,738 | 2.89 |
+| Vascular smooth muscle cells | VSM | 1,672 | 0.84 |
+
+Total: 198,675 cells
+
+Using DEINH-AC-MGL aggregation as an example:
+
+```r
+weights_data <- compute_spatial_weights_multi_image_3D(sce,
+                                                       type_column = "FUSEmap_main_level",
+                                                       point_type = "Di- and mesencephalon inhibitory neurons",
+                                                       image_column = "image",
+                                                       method = "k_nearest",
+                                                       k = 3000,
+                                                       coords = c("x", "y", "z"),
+                                                       exclude_ref_as_neighbor = TRUE)
+
+observed_mvlclq <- calculate_mvlclq_multi_image(sce,
+                                                weights_data,
+                                                type_column = "FUSEmap_main_level",
+                                                point_type = "Di- and mesencephalon inhibitory neurons",
+                                                target_types = c("Astrocytes", "Microglia"),
+                                                capped = TRUE,
+                                                capped_query_num = 2,
+                                                occurr_prob)
+
+sim_results <- simulate_multiscale_mvlclq_fast_3D_nonsequential(sce,
+                                                          weights_data,
+                                                          type_column = "FUSEmap_main_level",
+                                                          point_type = "Di- and mesencephalon inhibitory neurons",
+                                                          target_types = c("Astrocytes", "Microglia"),
+                                                          observed_mvlclq,
+                                                          occurr_prob,
+                                                          image_column = "image",
+                                                          scales = c(1500, 2100, 2700, 3300, 3900, 4500, 5000),
+                                                          coord_names = c("x", "y", "z"),
+                                                          simulation_times = 99)
+```
+
+Visualize results
+
+```r
+trendline_plot <- plot_reference_query_interactions_multi_image_mean(
+  sim_results, sce, type_column = "FUSEmap_main_level", image = "1")
+
+heatmap_CD4T <- Scatter_Heatmap(
+  sce, 
+  type_column = "FUSEmap_main_level",
+  sim_results,
+  coords = c("x", "y", "z"), scale = 1750, image_name = "1",
+  query_celltype = "Astrocytes_Microglia", reference_celltype = "Di- and mesencephalon inhibitory neurons", 
+  point_size = 1)
+```
+<p align="center">
+  <img src="man/figures/3D_MouseBrain_DEINH_AC_MGL_demo.png" alt="weight_kernels" width="900">
+</p>
+
+Analyses use the mouse brain Deep-STARmap dataset from Sui et al. (2025). Processed
+gene expression matrices and cell metadata are available from Zenodo under accession
+[10.5281/zenodo.16783355](https://doi.org/10.5281/zenodo.16783355).
+
 ### Alzheimer Mouse Brain
 
-To be updated
+Analyses use the STARmap PLUS dataset from a mouse model of Alzheimer's disease from Zeng et al. (2023). Processed expression matrices and cell annotations
+are available from Zenodo under [10.5281/zenodo.7332091](https://doi.org/10.5281/zenodo.7332091).
 
 ## License
 MANGO is licensed under the GNU General Public License v3.0 or any later version.
@@ -301,4 +428,6 @@ MANGO is licensed under the GNU General Public License v3.0 or any later version
 
 Ranek, J. S., Greenwald, N. F., Goldston, M., Fullaway, C. C., Sowers, C., Kong, A., Mouron, S., Quintela-Fandino, M., West, R. B. & Angelo, M. The automated computational workflow QUICHE reveals structural definitions of antitumor responses in triple-negative breast cancer. *Nature Cancer* **7**, 451–468 (2026). https://doi.org/10.1038/s43018-026-01122-5
 
+Sui, X., Lo, J.A., Luo, S. et al. Scalable spatial single-cell transcriptomics and translatomics in 3D thick tissue blocks. Nat Methods 22, 2574–2584 (2025). https://doi.org/10.1038/s41592-025-02867-0
 
+Zeng, H., Huang, J., Zhou, H. et al. Integrative in situ mapping of single-cell transcriptional states and tissue histopathology in a mouse model of Alzheimer’s disease. Nat Neurosci 26, 430–446 (2023). https://doi.org/10.1038/s41593-022-01251-x
