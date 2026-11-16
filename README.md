@@ -335,6 +335,7 @@ occurr_prob <- calculate_occurrence_probability_multi_image(
   type_column = "FUSEmap_main_level",
   image_column = "image")
 ```
+<p align="center">
 
 | Cell type | Abbreviation | N | % |
 |---|:---|---:|---:|
@@ -357,6 +358,8 @@ occurr_prob <- calculate_occurrence_probability_multi_image(
 | Vascular and leptomeningeal cells | VLM | 1,449 | 0.73 |
 | Vascular endothelial cells | VEN | 5,738 | 2.89 |
 | Vascular smooth muscle cells | VSM | 1,672 | 0.84 |
+
+</p>
 
 Total: 198,675 cells
 
@@ -409,7 +412,7 @@ heatmap_CD4T <- Scatter_Heatmap(
   point_size = 1)
 ```
 <p align="center">
-  <img src="man/figures/3D_MouseBrain_DEINH_AC_MGL_demo.png" alt="weight_kernels" width="900">
+  <img src="man/figures/3D_MouseBrain_DEINH_AC_MGL_demo.png" alt="weight_kernels" width="800">
 </p>
 
 Analyses use the mouse brain Deep-STARmap dataset from Sui et al. (2025). Processed
