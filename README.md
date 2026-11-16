@@ -412,7 +412,7 @@ heatmap_CD4T <- Scatter_Heatmap(
   point_size = 1)
 ```
 <p align="center">
-  <img src="man/figures/3D_MouseBrain_DEINH_AC_MGL_demo.png" alt="weight_kernels" width="700">
+  <img src="man/figures/3D_MouseBrain_DEINH_AC_MGL_demo.png" alt="weight_kernels" width="500">
 </p>
 
 Analyses use the mouse brain Deep-STARmap dataset from Sui et al. (2025). Processed
