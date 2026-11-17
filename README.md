@@ -21,6 +21,8 @@ For each reference cell, we compute local weighted proportions of the query type
 
 For the chosen query cell types, an observed mLCLQ score is computed for each reference cell. The score quantifies how strongly these query types co-occur in reference cells' neighborhoods. 
 
+Permutation testing is performed across multiple spatial scales. SES scores are computed as a descriptive spatial score characterizing local enrichment in comparison to the permuted cellular distributions. See [SES score interpretation](#ses) section for more details. 
+
 MANGO is under active development. We appreciate any suggestions and feedback. Contact: [zy56@rice.edu](mailto:zy56@rice.edu). 
 
 ## Install the Package
@@ -33,7 +35,7 @@ library(MANGO)
 ## Quick Start
 
 **Table of Content**
-- [Simulation](#simulation) - Simple Demonstrations
+- [Simulation](#simulation) - Simple Demonstration
 - [Needs Statement](#why-mango) - **Why MANGO?**
 - [Triple-Negative Breast Cancer](#triple-negative-breast-cancer) - Cohort-Level Analysis
 - [Mouse Brain Thick Slice](#mouse-brain-thick-slice) - Extension to 3D Data
@@ -150,15 +152,18 @@ ses_panel(sim_sce, sim_mLCLQ,
           coords = c("x_coord", "y_coord"),
           scale = 2000, image_name = "1")
 ```
-**How to read SES?** 
-
-At each permutation scale, MANGO compares a reference cell’s observed mLCLQ with the null mLCLQ scores computed from the permuted cell labels. The standardized enrichment score (SES) quantifies how far the observed score lies from the mean permuted score (relative to the variation among permutations). Positive SES indicates co-localization; negative SES indicates repulsion.
 
 We visualize the mean SES score for each interaction across multiple permutation scales as well as single-cell-level SES scores
 
 <p align="center">
   <img src="man/figures/simulation_results_demo.png" alt="weight_kernels" width="900">
 </p>
+
+<a id="ses"></a>
+**How to read SES?** 
+
+At each permutation scale, MANGO compares a reference cell’s observed mLCLQ with the null mLCLQ scores computed from the permuted cell labels. The standardized enrichment score (SES) quantifies how far the observed score lies from the mean permuted score (relative to the variation among permutations). Positive SES indicates co-localization; negative SES indicates repulsion.
+
 
 The trendline plot shows a summary of each interaction across different scales; the SES score spatial map shows where each aggregation is observed: high SES scores (yellow) represent aggregations, low SES scores (blue) represent repulsions. \
 We benchmarked MANGO's power and false discovery rate against pairwise methods across 273 simulation cases (100 replicates each), and assessed its sensitivity to 7 background proportions and 3 neighborhood sizes (k).
