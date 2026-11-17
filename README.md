@@ -601,7 +601,7 @@ are available from Zenodo under [10.5281/zenodo.7332091](https://doi.org/10.5281
 ## License
 MANGO is licensed under the GNU General Public License v3.0 or any later version.
 
-## References
+## Key References
 
 Ranek, J. S., Greenwald, N. F., Goldston, M., Fullaway, C. C., Sowers, C., Kong, A., Mouron, S., Quintela-Fandino, M., West, R. B. & Angelo, M. The automated computational workflow QUICHE reveals structural definitions of antitumor responses in triple-negative breast cancer. *Nature Cancer* **7**, 451–468 (2026). https://doi.org/10.1038/s43018-026-01122-5
 
