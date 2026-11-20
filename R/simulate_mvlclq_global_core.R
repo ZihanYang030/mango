@@ -295,7 +295,7 @@ run_simulations_global <- function(simulation_times, all_labels, point_indices,
     colnames(L_perm) <- all_types
     if (any(valid)) {L_perm[cbind(which(valid), type_idx[valid])] <- 1 }
 
-    P_null <- A_normalized %*% L_perm # n_ref x C, columns named by all_types
+    P_null <- A_normalized %*% L_perm 
 
     for (interaction_name in interaction_names) {
       target_types_vec <- observed_scores[[interaction_name]]$target_types
