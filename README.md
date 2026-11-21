@@ -655,7 +655,7 @@ A_normalized <- matrix(0, nrow = n_ref, ncol = N_other)
 sum_w <- sum(weights)
 norm_w <- if (sum_w > 0) weights/sum_w else rep(1/length(weights), length(weights))
 
-keep <- !is.na(neighbor_positions) # drop unmatched safely
+keep <- !is.na(neighbor_positions) 
 A_normalized[i, neighbor_positions[keep]] <- norm_w[keep]
 ```
 
@@ -733,8 +733,8 @@ Each permutation independently permutes the original labels.
 
 ```r
 universe <- if (permute_ref) {
-  sort(unique(c(point_indices, other_indices))) # every cell in the tissue
-} else {setdiff(other_indices, point_indices)} # non-reference cells only
+  sort(unique(c(point_indices, other_indices)))
+} else {setdiff(other_indices, point_indices)}
 ```
 
 ```r
