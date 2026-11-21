@@ -610,22 +610,21 @@ MANGO processes multiple images iteratively. All the counts and permutations bel
 Gaussian
 
 ```math
-w_{ij}=\exp\left[-\frac{1}{2}\left(\frac{d_{ij}}{b_i}\right)^2\right],\qquad j\in N_i.
+w_{ij}=\exp\left[-\frac{1}{2}\left(\frac{d_{ij}}{b_i}\right)^2\right],\; j\in N_i.
 ```
 
 Matérn-3/2
 
 ```math
 w_{ij}=\left(1+\sqrt{3}\frac{d_{ij}}{b_i}\right)
-\exp\left(-\sqrt{3}\frac{d_{ij}}{b_i}\right),\qquad j\in N_i.
+\exp\left(-\sqrt{3}\frac{d_{ij}}{b_i}\right),\; j\in N_i.
 ```
 
 Exponential
 
 ```math
-w_{ij}=\exp\left(-\frac{d_{ij}}{b_i}\right),\qquad j\in N_i.
+w_{ij}=\exp\left(-\frac{d_{ij}}{b_i}\right),\; j\in N_i.
 ```
-
 
 [`kernel_weights.R`](R/kernel_weights.R):
 
@@ -639,45 +638,37 @@ switch(kernel,
 
 **Normalized neighborhood weights**
 
-$$
+```math
 a_{ij}=\begin{cases}
-\displaystyle\frac{w_{ij}}{\sum_{k\in N_i}w_{ik}},&j\in N_i,\\[6pt]
-0,&j\notin N_i.
+\dfrac{w_{ij}}{\sum_{k\in N_i}w_{ik}}, & j\in N_i,\\
+0, & j\notin N_i.
 \end{cases}
-$$
+```
 
 [`simulate_mvlclq_global_core.R`](R/simulate_mvlclq_global_core.R), `build_A_normalized()`:
 
-``` r
+```r
 A_normalized <- matrix(0, nrow = n_ref, ncol = N_other)
+```
 
-for (i in seq_len(n_ref)) {
-  neighbors <- current_spatial_weights$neighbors[[i]]
-  weights <- current_spatial_weights$weights[[i]]
+```r
+sum_w <- sum(weights)
+norm_w <- if (sum_w > 0) weights/sum_w else rep(1/length(weights), length(weights))
 
-  if (length(weights) > 0) {
-    neighbor_positions <- match(neighbors, other_indices) # global vs global
-    sum_w <- sum(weights)
-    norm_w <- if (sum_w > 0) weights/sum_w else rep(1/length(weights), length(weights))
-
-    keep <- !is.na(neighbor_positions) # drop unmatched safely
-    A_normalized[i, neighbor_positions[keep]] <- norm_w[keep]
-  }
-}
+keep <- !is.na(neighbor_positions) # drop unmatched safely
+A_normalized[i, neighbor_positions[keep]] <- norm_w[keep]
 ```
 
 **Local joint abundance**
 
-$$
+```math
 \widehat p_{i,B_1,\ldots,B_C}
-=\prod_{\ell=1}^{C}\left(\sum_{j\in N_i}a_{ij}\,I\{j\in B_{\ell}\}\right)
-=\frac{\displaystyle\prod_{\ell=1}^{C}\sum_{j\in N_i}w_{ij}I\{j\in B_{\ell}\}}
-{\displaystyle\left(\sum_{j\in N_i}w_{ij}\right)^C}.
-$$
+=\prod_{\ell=1}^{C}\left(\sum_{j\in N_i}a_{ij}I\{j\in B_\ell\}\right).
+```
 
 [`calculate_mvlclq_multi_image.R`](R/calculate_mvlclq_multi_image.R), query-type weight sums:
 
-``` r
+```r
 type_weights <- setNames(numeric(iter), current_targets)
 for (j in seq_len(iter)) {
   tm <- neighbors_types == current_targets[j]
@@ -687,116 +678,92 @@ for (j in seq_len(iter)) {
 
 **Global abundance denominator**
 
-$$
+```math
 p_{B_1,\ldots,B_C}=\prod_{\ell=1}^{C}\frac{N_{B_\ell}}{N-1}.
-$$
+```
 
 [`calculate_mvlclq_multi_image.R`](R/calculate_mvlclq_multi_image.R):
 
-``` r
-if (iter == 1) {
-  # singel query type
-  type_count <- type_counts[current_targets]
-  mvlclq_denominator <- type_count / ((total_count-1)^iter)
-} else {
-  # multiple query types
-  product_counts <- prod(as.numeric(type_counts[current_targets]))
-  mvlclq_denominator <- product_counts / (total_count-1)^iter
-}
+```r
+product_counts <- prod(as.numeric(type_counts[current_targets]))
+mvlclq_denominator <- product_counts / (total_count-1)^iter
 ```
 
 **Cell-level mLCLQ**
 
-$$
+```math
 \mathrm{mLCLQ}_i
 =\frac{\widehat p_{i,B_1,\ldots,B_C}}{p_{B_1,\ldots,B_C}}.
-$$
+```
 
 [`calculate_mvlclq_multi_image.R`](R/calculate_mvlclq_multi_image.R), multi-query case:
 
-``` r
+```r
 if (prod(type_weights) == 0) {
   mvlclq_value <- 0
 } else if (sum_weights > 0) {
   mvlclq_value <- (prod(type_weights)/(sum_weights^iter)) / mvlclq_denominator
-} else {
-  mvlclq_value <- if (length(neighbors_types) > 0) (prod(type_weights)/length(neighbors_types)) / mvlclq_denominator else 0
-}
 ```
 
 **Tissue-level mLCLQ**
 
-$$
+```math
 \mathrm{mLCLQ}_{\mathrm{global}}=\frac{1}{N_A}\sum_{i=1}^{N_A}\mathrm{mLCLQ}_i.
-$$
+```
 
 [`calculate_mvlclq_multi_image.R`](mango/R/calculate_mvlclq_multi_image.R):
 
-``` r
+```r
 list( local_mvlclq = mvlclq_values, global_mvlclq = mean(mvlclq_values), target_types = current_targets, iter = iter )
 ```
 
 **Full-tissue permutation of labels**
 
-$$
-U=\begin{cases}
-\text{all cell positions in the tissue image},&\texttt{permute\_ref=TRUE},\\
-\text{non-reference cell positions in the tissue image},&\texttt{permute\_ref=FALSE}.
-\end{cases}
-\qquad
+```math
 y_j^{(p)}=\begin{cases}
-y_{\pi_p(j)},&j\in U_p,\\
-y_j,&j\notin U_p,
+y_{\pi_p(j)}, & j\in U_p,\\
+y_j, & j\notin U_p,
 \end{cases}
-\quad p=1,\ldots,P.
-$$
+\qquad p=1,\ldots,P.
+```
 
 Each permutation independently permutes the original labels.
 
 [`simulate_mvlclq_global_core.R`](R/simulate_mvlclq_global_core.R), `run_simulations_global()`:
 
-``` r
+```r
 universe <- if (permute_ref) {
   sort(unique(c(point_indices, other_indices))) # every cell in the tissue
 } else {setdiff(other_indices, point_indices)} # non-reference cells only
-
-n_universe <- length(universe)
-
-n_to_shuffle <- if (downsample_fraction < 1.0) {
-  max(2L, as.integer(floor(n_universe * downsample_fraction)))
-} else {n_universe}
 ```
 
-``` r
-for (k in seq_len(simulation_times)) {
+```r
+labels_k <- all_labels
 
-  labels_k <- all_labels
+# pick participating cells from the universe
+pool <- if (downsample_fraction < 1.0 && n_to_shuffle < n_universe) {
+  universe[sample.int(n_universe, n_to_shuffle)]} else {universe}
 
-  # pick participating cells from the universe
-  pool <- if (downsample_fraction < 1.0 && n_to_shuffle < n_universe) {
-    universe[sample.int(n_universe, n_to_shuffle)]} else {universe}
-
-  # global permutation of labels among the pool (do not change the locations)
-  labels_k[pool] <- labels_k[pool][sample.int(length(pool))]
+# global permutation of labels among the pool (do not change the locations)
+labels_k[pool] <- labels_k[pool][sample.int(length(pool))]
 ```
 
 **Permuted cell-level mLCLQ**
 
-$$
+```math
 \mathrm{mLCLQ}_i^{(p)}
 =\frac{\displaystyle\prod_{\ell=1}^{C}
 \left(\sum_{j\in N_i}a_{ij}I\{y_j^{(p)}=B_\ell\}\right)}
-{p_{B_1,\ldots,B_C}},
-\qquad p=1,\ldots,P.
-$$
+{p_{B_1,\ldots,B_C}}.
+```
 
 [`simulate_mvlclq_global_core.R`](R/simulate_mvlclq_global_core.R), `run_simulations_global()`:
 
 ``` r
-P_null <- A_normalized %*% L_perm # n_ref x C, columns named by all_types
+P_null <- A_normalized %*% L_perm 
 ```
 
-``` r
+```r
 product_counts <- prod(as.numeric(type_counts[target_types_vec]))
 mvlclq_denominator <- product_counts / (total_count - 1)^length(target_types_vec)
 v_null <- P_null[, target_types_vec[1]]
@@ -808,81 +775,71 @@ v_null <- v_null / mvlclq_denominator
 
 **Full-tissue test statistic**
 
-$$
-T_{\mathrm{obs}}=\frac{1}{N_A}\sum_{i=1}^{N_A}\log\left(1+\mathrm{mLCLQ}_i\right),
+```math
+T_{\mathrm{obs}}=\frac{1}{N_A}\sum_{i=1}^{N_A}\log(1+\mathrm{mLCLQ}_i),
 \qquad
-T_{\mathrm{sim}}^{(p)}=\frac{1}{N_A}\sum_{i=1}^{N_A}\log\left(1+\mathrm{mLCLQ}_i^{(p)}\right).
-$$
+T_{\mathrm{sim}}^{(p)}=\frac{1}{N_A}\sum_{i=1}^{N_A}\log(1+\mathrm{mLCLQ}_i^{(p)}).
+```
 
 [`simulate_mvlclq_global_core.R`](R/simulate_mvlclq_global_core.R), `calculate_significance_fullt()`:
 
-``` r
+```r
 if (log_transform) {
   v_obs <- log(observed_scores[[interaction_name]]$observed + 1)
   S_sim <- log(simulated_scores[[interaction_name]] + 1)
-} else {
-  v_obs <- observed_scores[[interaction_name]]$observed
-  S_sim <- simulated_scores[[interaction_name]]
-}
 ```
 
-[`simulate_mvlclq_global_core.R`](R/simulate_mvlclq_global_core.R), `full_tissue_significance()`:
-
-``` r
+```r
 rowmeans <- rowMeans(interactions[[interaction_name]][["simulated_mvlclq"]])
 mean_observed <- mean(interactions[[interaction_name]][["observed"]])
 ```
 
 ## Empirical tissue-level p-values 
 
-$$
+```math
 p_{\mathrm{upper}}
-=\frac{1+\#\{p:T_{\mathrm{sim}}^{(p)}\ge T_{\mathrm{obs}}\}}{1+P},
+=\frac{1+\left|\left\{p:T_{\mathrm{sim}}^{(p)}\ge T_{\mathrm{obs}}\right\}\right|}{1+P},
 \qquad
 p_{\mathrm{lower}}
-=\frac{1+\#\{p:T_{\mathrm{sim}}^{(p)}\le T_{\mathrm{obs}}\}}{1+P}.
-$$
+=\frac{1+\left|\left\{p:T_{\mathrm{sim}}^{(p)}\le T_{\mathrm{obs}}\right\}\right|}{1+P}.
+```
 
-$$
-p_{\mathrm{selected}}=
-\begin{cases}
-p_{\mathrm{upper}},&T_{\mathrm{obs}}\ge\operatorname{median}(T_{\mathrm{sim}}^{(1)},\ldots,T_{\mathrm{sim}}^{(P)}),\\
-p_{\mathrm{lower}},&T_{\mathrm{obs}}<\operatorname{median}(T_{\mathrm{sim}}^{(1)},\ldots,T_{\mathrm{sim}}^{(P)}),
+selects the upper tail when $T_{\mathrm{obs}}$ is at least the median of the permuted statistics; otherwise we select the lower tail:
+
+```math
+p_{\mathrm{selected}}=\begin{cases}
+p_{\mathrm{upper}}, & T_{\mathrm{obs}}\ge \mathrm{median}(T_{\mathrm{sim}}^{(1)},\ldots,T_{\mathrm{sim}}^{(P)}),\\
+p_{\mathrm{lower}}, & T_{\mathrm{obs}}<\mathrm{median}(T_{\mathrm{sim}}^{(1)},\ldots,T_{\mathrm{sim}}^{(P)}).
 \end{cases}
-\qquad
-p_{\mathrm{two\text{-}tailed}}=\min\{1,2p_{\mathrm{selected}}\}.
-$$
+```
+
+```math
+p_{\mathrm{two}}=\min\left(1,2p_{\mathrm{selected}}\right).
+```
 
 [`simulate_mvlclq_global_core.R`](R/simulate_mvlclq_global_core.R), `full_tissue_significance()`:
 
-``` r
+```r
 null_medians <- median(rowmeans)
 upper_tail <- mean_observed >= null_medians
 
 n_greater_equal <- numeric()
 if (upper_tail) {
-  # eqn 7 as of manuscript v 9.1
   n_greater_equal <- sum(rowmeans >= mean_observed)
 } else {
-  # eqn 8 as of manuscript v 9.1
   n_greater_equal <- sum(rowmeans <= mean_observed)
 }
 
-# empirical p
 interaction_p <- (1+n_greater_equal) / (1+simulation_times)
-
-interactions[[interaction_name]][["onetail_fulltissue_pval"]] <- interaction_p
-interactions[[interaction_name]][["tail"]] <- ifelse(upper_tail, "upper_tail", "lower_tail")
-# eqn 9 as of manuscript v 9.1
 two_tail_p <- min(2 * interaction_p, 1)
 ```
 
 **Bonferroni correction across interactions**
 
-$$
-p_{\mathrm{two\text{-}tailed}}\le\frac{\alpha}{M},
-\qquad M=\text{number of tested interactions}.
-$$
+```math
+p_{\mathrm{two}}\le\frac{\alpha}{M},
+\qquad M=\text{number of interactions tested in the tissue image}.
+```
 
 [`simulate_mvlclq_global_core.R`](R/simulate_mvlclq_global_core.R), `full_tissue_significance()`:
 
