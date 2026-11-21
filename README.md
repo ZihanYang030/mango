@@ -794,7 +794,7 @@ rowmeans <- rowMeans(interactions[[interaction_name]][["simulated_mvlclq"]])
 mean_observed <- mean(interactions[[interaction_name]][["observed"]])
 ```
 
-## Empirical tissue-level p-values 
+**Empirical tissue-level p-values** 
 
 ```math
 p_{\mathrm{upper}}
@@ -838,7 +838,7 @@ two_tail_p <- min(2 * interaction_p, 1)
 
 ```math
 p_{\mathrm{two}}\le\frac{\alpha}{M},
-\qquad M=\text{number of interactions tested in the tissue image}.
+\qquad M=\text{number of interactions tested in the tissue image}
 ```
 
 [`simulate_mvlclq_global_core.R`](R/simulate_mvlclq_global_core.R), `full_tissue_significance()`:
