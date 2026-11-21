@@ -601,20 +601,31 @@ are available from Zenodo under [10.5281/zenodo.7332091](https://doi.org/10.5281
 
 ### MANGO Algorithm
 
-In the following equations, A represents the reference cell type, N<sub>A</sub> represents the cell count, and (B<sub>1</sub>,...,B<sub>C</sub>) are the query cell types. 
+In the following equations, $A$ represents the reference cell type, $N_A$ represents the cell count, and $B_1,\ldots,B_C$ are the query cell types. 
 
 MANGO processes multiple images iteratively. All the counts and permutations below are within one single tissue image.
 
 **Distance-decay kernels**
 
-$$
-\begin{aligned}
-w_{ij}^{\mathrm{Gaussian}}&=\exp\left[-\frac{1}{2}\left(\frac{d_{ij}}{b_i}\right)^2\right],\\
-w_{ij}^{\mathrm{Mat\acute ern}\text{-}3/2}&=\left(1+\sqrt{3}\frac{d_{ij}}{b_i}\right)\exp\left(-\sqrt{3}\frac{d_{ij}}{b_i}\right),\\
-w_{ij}^{\mathrm{exponential}}&=\exp\left(-\frac{d_{ij}}{b_i}\right),
-\qquad j\in N_i.
-\end{aligned}
-$$
+Gaussian
+
+```math
+w_{ij}=\exp\left[-\frac{1}{2}\left(\frac{d_{ij}}{b_i}\right)^2\right],\qquad j\in N_i.
+```
+
+Matérn-3/2
+
+```math
+w_{ij}=\left(1+\sqrt{3}\frac{d_{ij}}{b_i}\right)
+\exp\left(-\sqrt{3}\frac{d_{ij}}{b_i}\right),\qquad j\in N_i.
+```
+
+Exponential
+
+```math
+w_{ij}=\exp\left(-\frac{d_{ij}}{b_i}\right),\qquad j\in N_i.
+```
+
 
 [`kernel_weights.R`](R/kernel_weights.R):
 
