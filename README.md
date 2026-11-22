@@ -21,7 +21,7 @@ For each reference cell, we compute local weighted proportions of the query type
 
 For the chosen query cell types, an observed mLCLQ score is computed for each reference cell. The score quantifies how strongly these query types co-occur in reference cells' neighborhoods. 
 
-Permutation testing is performed across multiple spatial scales. SES scores are computed as a descriptive spatial score characterizing local enrichment in comparison to the permuted cellular distributions. See [SES score interpretation](#ses) section for more details. 
+Permutation testing is performed across multiple spatial scales. SES scores are computed as a descriptive spatial score characterizing local enrichment in comparison to the permuted cellular distributions. See [SES score interpretation](#ses) section for more details. See [MANGO algorithm](#MANGO-Algorithm) section for method documentation.
 
 MANGO is under active development. We appreciate any suggestions and feedback. Contact: [zy56@rice.edu](mailto:zy56@rice.edu). 
 
