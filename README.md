@@ -740,11 +740,9 @@ universe <- if (permute_ref) {
 ```r
 labels_k <- all_labels
 
-# pick participating cells from the universe
 pool <- if (downsample_fraction < 1.0 && n_to_shuffle < n_universe) {
   universe[sample.int(n_universe, n_to_shuffle)]} else {universe}
 
-# global permutation of labels among the pool (do not change the locations)
 labels_k[pool] <- labels_k[pool][sample.int(length(pool))]
 ```
 
