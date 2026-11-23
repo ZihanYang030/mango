@@ -78,19 +78,16 @@ Neighborhood is created around each type A cell.
 occurr_prob <- calculate_occurrence_probability_multi_image(sim_sce, type_column = "cell_type", image_column = "image_number")
 
 # gaussian weight
-weight_g <- compute_spatial_weights_multi_image(sim_sce, type_column = "cell_type",
-                                               type_column = "cell_type", point_type = "A", 
+weight_g <- compute_spatial_weights_multi_image(sim_sce, type_column = "cell_type", point_type = "A", 
                                                image_column = "image_number", method = "k_nearest", 
                                                k = 35, coords = c("x_coord", "y_coord"), kernel = "gaussian")
 
 # we also have matern and exponential weights available
-weight_m <- compute_spatial_weights_multi_image(sim_sce, type_column = "cell_type",
-                                               type_column = "cell_type", point_type = "A", 
+weight_m <- compute_spatial_weights_multi_image(sim_sce, type_column = "cell_type", point_type = "A", 
                                                image_column = "image_number", method = "k_nearest", 
                                                k = 35, coords = c("x_coord", "y_coord"), kernel = "matern")
 
-weight_e <- compute_spatial_weights_multi_image(sim_sce, type_column = "cell_type",
-                                                type_column = "cell_type", point_type = "A", 
+weight_e <- compute_spatial_weights_multi_image(sim_sce, type_column = "cell_type", point_type = "A", 
                                                 image_column = "image_number", method = "k_nearest", 
                                                 k = 35, coords = c("x_coord", "y_coord"), kernel = "exponential")
 ```
