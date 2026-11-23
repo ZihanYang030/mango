@@ -52,6 +52,8 @@ Visualize a simulated section.
 ```r
 library(MANGO)
 library(patchwork)
+library(dplyr)
+library(ggplot2)
 
 # generate simulation data
 sim <- generate_alternative_circle_simulation(num_cells = 5000, circle_radius = 350, circle_distances = 300)
