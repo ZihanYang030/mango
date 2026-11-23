@@ -134,7 +134,7 @@ sim_mLCLQ <- simulate_multiscale_mvlclq_fast_downsample(
   sim_sce, weight_g, type_column = "cell_type", 
   point_type = "A", target_types = c("B", "C"),
   obs_mLCLQ, occurr_prob, image_column = "image_number",
-  scales = c(50, 250, 500, 750, 1000, 1250, 1500, 1750, 2000),
+  scales = c(50, 500, 1000, 1500, 2000),
   coord_names = c("x_coord", "y_coord"))
 ```
 Multi-scale permutation is performed by constructing permutation squares with different side lengths using each reference cell as the centric. 
