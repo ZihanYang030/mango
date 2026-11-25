@@ -307,6 +307,8 @@ simulate_multiscale_mvlclq_fast_3D_nonsequential <- function(
         simulation_time <- as.numeric(difftime(Sys.time(), simulation_start, units = "secs"))
       }
       
+      if (record_timing) stats_start <- Sys.time()
+      
       scale_results <- list(
         scale = scale,
         image_id = current_image,
