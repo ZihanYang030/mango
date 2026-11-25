@@ -7,7 +7,7 @@
 #' @param point_type Reference cell type, input as character object
 #' @param target_types Query cell types, input as a vector of character objects
 #' @param observed_mvlclq_multi observed mlCLQ scores calculated with calculate_mvlclq_multi_image
-#' @param occurrence_probs_multi occurrence probability calcualted with calculate_occurrence_probability_multi_image
+#' @param occurrence_probs_multi occurrence probability calculated with calculate_occurrence_probability_multi_image
 #' @param image_column Column name for image index
 #' @param scales permutation scales; permutation squares constructed with side lengths of scales, neighborhood sizes would not be changed
 #' @param coord_names column names for spatial coordinates
@@ -75,9 +75,7 @@ simulate_multiscale_mvlclq_fast_downsample <- function(sce_obj,
   # process each image
   for (current_image in unique_images) {
 
-    if (record_timing) {
-      image_start_time <- Sys.time()
-    }
+    if (record_timing) image_start_time <- Sys.time()
 
     # Get image-specific data
     if (is.null(image_column) || image_column == "single_image") {

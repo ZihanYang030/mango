@@ -37,7 +37,7 @@ simulate_multiscale_mvlclq_fast_downsample(
 
 \item{observed_mvlclq_multi}{observed mlCLQ scores calculated with calculate_mvlclq_multi_image}
 
-\item{occurrence_probs_multi}{occurrence probability calcualted with calculate_occurrence_probability_multi_image}
+\item{occurrence_probs_multi}{occurrence probability calculated with calculate_occurrence_probability_multi_image}
 
 \item{image_column}{Column name for image index}
 
