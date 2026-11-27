@@ -461,7 +461,7 @@ plaque_df_prepared <- data.frame(
 combined_data <- rbind(spatial_13months_disease_replicate_2, plaque_df_prepared)
 
 if(any(duplicated(combined_data$NAME))) { # plaque ID should not be duplicates of cell ID - dedup
-  warning("There are still duplicate NAMEs!")
+  warning("duplicate NAMEs!")
   print(combined_data$NAME[duplicated(combined_data$NAME)])
 }
 
